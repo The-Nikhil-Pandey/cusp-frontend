@@ -1,20 +1,46 @@
-
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Search, Bell, MessageCircle, Bookmark, Moon, Sun, User, LogOut, Settings, Eye } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useAuth } from '@/contexts/AuthContext';
-import SearchModal from './SearchModal';
-import NotificationsPanel from './NotificationsPanel';
-import ChatPanel from './ChatPanel';
-import SavedPostsModal from './SavedPostsModal';
-import UserProfileModal from './UserProfileModal';
-import EditProfileModal from './EditProfileModal';
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  Search,
+  Bell,
+  MessageCircle,
+  Bookmark,
+  Moon,
+  Sun,
+  User,
+  LogOut,
+  Settings,
+  Eye,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
+import SearchModal from "./SearchModal";
+import NotificationsPanel from "./NotificationsPanel";
+import ChatPanel from "./ChatPanel";
+import SavedPostsModal from "./SavedPostsModal";
+import UserProfileModal from "./UserProfileModal";
+import EditProfileModal from "./EditProfileModal";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -30,10 +56,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [editProfileOpen, setEditProfileOpen] = useState(false);
 
   const navItems = [
-    { name: 'Home', path: '/dashboard' },
-    { name: 'Events', path: '/events' },
-    { name: 'Members', path: '/members' },
-    { name: 'Leaderboard', path: '/leaderboard' }
+    { name: "Home", path: "/dashboard" },
+    { name: "Events", path: "/events" },
+    { name: "Members", path: "/members" },
+    { name: "Leaderboard", path: "/leaderboard" },
   ];
 
   return (
@@ -44,10 +70,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/dashboard" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-xl">C</span>
+              <div className=" rounded-lg flex items-center justify-center">
+                {/* <span className="text-primary-foreground font-bold text-xl">C</span> */}
+                <img
+                  src={
+                    theme === "dark"
+                      ? "/cusp-logo-dark.png"
+                      : "/cusp-logo-light.png"
+                  }
+                  alt="CUSP Logo"
+                  className="h-60"
+                />
               </div>
-              <span className="text-2xl font-bold text-primary">CUSP</span>
+              {/* <span className="text-2xl font-bold text-primary">CUSP</span> */}
             </Link>
 
             {/* Navigation */}
@@ -58,8 +93,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   to={item.path}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     location.pathname === item.path
-                      ? 'bg-accent text-accent-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                   }`}
                 >
                   {item.name}
@@ -82,7 +117,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {/* Notifications */}
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground relative">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground relative"
+                  >
                     <Bell className="h-5 w-5" />
                     <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full text-xs"></span>
                   </Button>
@@ -98,7 +137,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {/* Chats */}
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
                     <MessageCircle className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
@@ -127,13 +170,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={toggleTheme}
                 className="text-muted-foreground hover:text-foreground"
               >
-                {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
               </Button>
 
               {/* Profile Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
                     <User className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -163,8 +214,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Modals */}
       <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
       <SavedPostsModal open={savedPostsOpen} onOpenChange={setSavedPostsOpen} />
-      <UserProfileModal open={userProfileOpen} onOpenChange={setUserProfileOpen} />
-      <EditProfileModal open={editProfileOpen} onOpenChange={setEditProfileOpen} />
+      <UserProfileModal
+        open={userProfileOpen}
+        onOpenChange={setUserProfileOpen}
+      />
+      <EditProfileModal
+        open={editProfileOpen}
+        onOpenChange={setEditProfileOpen}
+      />
     </div>
   );
 };
