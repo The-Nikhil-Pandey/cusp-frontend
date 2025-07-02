@@ -29,27 +29,19 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
   if (!user) return null;
 
   // Parse tag_id if it's a string (from API)
-  let tagIds: number[] = [];
-  if (user.tag_id) {
-    if (typeof user.tag_id === "string") {
-      try {
-        tagIds = JSON.parse(user.tag_id);
-      } catch {
-        tagIds = [];
-      }
-    } else {
-      tagIds = user.tag_id;
-    }
-  }
+  // tag_id is now always an array of numbers
+  const tagIds: number[] = Array.isArray(user.tag_id) ? user.tag_id : [];
 
   // Map tag IDs to tag names
   const tagNames = tagIds
     .map((id) => tags.find((t) => t.id === id)?.name)
     .filter(Boolean);
 
+  console.log("user", user);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl  max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Profile</DialogTitle>
         </DialogHeader>
@@ -100,11 +92,15 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
           <div>
             <h4 className="font-medium mb-2">Social Care Work</h4>
             <div className="flex flex-wrap gap-2">
-              {user?.socialCareWork?.map((work) => (
-                <Badge key={work} variant="secondary">
-                  {work}
-                </Badge>
-              )) || <p className="text-muted-foreground">Not specified</p>}
+              {tagNames.length > 0 ? (
+                tagNames.map((name) => (
+                  <Badge key={name} variant="secondary">
+                    {name}
+                  </Badge>
+                ))
+              ) : (
+                <p className="text-muted-foreground">Not specified</p>
+              )}
             </div>
           </div>
 
@@ -139,7 +135,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 : "Not specified"}
             </p>
           </div>
-          <div>
+          {/* <div>
             <h4 className="font-medium mb-2">Tags</h4>
             <div className="flex flex-wrap gap-2">
               {tagNames.length > 0 ? (
@@ -152,7 +148,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 <p className="text-muted-foreground">Not specified</p>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
       </DialogContent>
     </Dialog>

@@ -79,7 +79,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       : "/cusp-logo-light.png"
                   }
                   alt="CUSP Logo"
-                  className="h-10"
+                  className="h-7 md:h-10 w-auto"
                 />
               </div>
               {/* <span className="text-2xl font-bold text-primary">CUSP</span> */}
@@ -103,7 +103,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
 
             {/* Right side */}
-            <div className="flex items-center space-x-3">
+            <div className="hidden md:flex items-center space-x-3">
               {/* Search */}
               <Button
                 variant="ghost"
@@ -203,6 +203,113 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            </div>
+
+            <div className="md:hidden flex items-center">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-10 w-10 text-muted-foreground"
+                      style={{ width: "24px", height: "24px" }}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
+                    </svg>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-72 sm:w-80">
+                  <SheetHeader>
+                    <SheetTitle>Menu</SheetTitle>
+                  </SheetHeader>
+
+                  {/* Nav Items */}
+                  <div className="flex flex-col space-y-2 mt-4">
+                    {navItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.path}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                          location.pathname === item.path
+                            ? "bg-accent text-accent-foreground"
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+
+                  <div className="border-t my-4" />
+
+                  {/* Action Icons */}
+                  <div className="flex flex-col space-y-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setSearchOpen(true)}
+                      className="justify-start text-muted-foreground hover:text-foreground"
+                    >
+                      <Search className="h-5 w-5 mr-2" /> Search
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      onClick={() => setSavedPostsOpen(true)}
+                      className="justify-start text-muted-foreground hover:text-foreground"
+                    >
+                      <Bookmark className="h-5 w-5 mr-2" /> Saved Posts
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      onClick={toggleTheme}
+                      className="justify-start text-muted-foreground hover:text-foreground"
+                    >
+                      {theme === "dark" ? (
+                        <>
+                          <Sun className="h-5 w-5 mr-2" /> Light Mode
+                        </>
+                      ) : (
+                        <>
+                          <Moon className="h-5 w-5 mr-2" /> Dark Mode
+                        </>
+                      )}
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      onClick={() => setUserProfileOpen(true)}
+                      className="justify-start text-muted-foreground hover:text-foreground"
+                    >
+                      <Eye className="h-5 w-5 mr-2" /> View Profile
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      onClick={() => setEditProfileOpen(true)}
+                      className="justify-start text-muted-foreground hover:text-foreground"
+                    >
+                      <Settings className="h-5 w-5 mr-2" /> Edit Profile
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      onClick={logout}
+                      className="justify-start text-muted-foreground hover:text-foreground"
+                    >
+                      <LogOut className="h-5 w-5 mr-2" /> Sign Out
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>

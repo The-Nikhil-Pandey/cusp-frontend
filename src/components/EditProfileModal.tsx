@@ -67,7 +67,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     user?.socialCareWork || []
   );
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
-    user?.tag_id || []
+    Array.isArray(user?.tag_id) ? user?.tag_id : []
   );
   const [language, setLanguage] = useState(user?.language || "");
   const [headline, setHeadline] = useState(user?.headline || "");

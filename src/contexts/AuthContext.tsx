@@ -74,11 +74,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     ) {
       socialCareWork = [apiUser.socialCareWork];
     }
+
+    // Fix profile_photo URL
+    let profileImage = apiUser.profile_photo;
+    if (profileImage && profileImage.includes("localhost")) {
+      profileImage = profileImage.replace("localhost", "31.97.56.234");
+    }
+
+    // Convert tag_id to array of numbers
+    let tag_id: number[] = [];
+    if (Array.isArray(apiUser.tag_id)) {
+      tag_id = apiUser.tag_id;
+    } else if (
+      typeof apiUser.tag_id === "string" &&
+      apiUser.tag_id.trim() !== ""
+    ) {
+      tag_id = apiUser.tag_id
+        .split(",")
+        .map((id: string) => Number(id.trim()))
+        .filter(Boolean);
+    }
+
     const user: User = {
       id: apiUser.id.toString(),
       email: apiUser.email,
       fullName: apiUser.username,
-      profileImage: apiUser.profile_photo || undefined,
+      profileImage,
       timezone: apiUser.timezone,
       jobTitle: apiUser.job_title,
       company: apiUser.company_name,
@@ -87,6 +108,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       profileCompleted: true,
       joinedDate: new Date().toISOString(), // You may want to use a real field
       socialCareWork, // Always an array
+      phone: apiUser.phone || "",
+      que1: apiUser.que1 || "",
+      que2: apiUser.que2 || "",
+      tag_id,
     };
     setUser(user);
     localStorage.setItem("cusp-user", JSON.stringify(user));
