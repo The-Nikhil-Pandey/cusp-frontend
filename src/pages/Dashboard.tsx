@@ -1,64 +1,99 @@
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Calendar,
+  MapPin,
+  Users,
+  MessageCircle,
+  Heart,
+  Bookmark,
+} from "lucide-react";
+import CreatePostModal from "@/components/CreatePostModal";
+import PostCard from "@/components/PostCard";
+import { fetchTags, Tag } from "@/api/tags";
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Users, MessageCircle, Heart, Bookmark } from 'lucide-react';
-import CreatePostModal from '@/components/CreatePostModal';
-import PostCard from '@/components/PostCard';
-
-// Mock data
-const mainTags = ['Healthcare', 'Mental Health', 'Community', 'Resources', 'Support'];
-const chatTags = ['General', 'Questions', 'Advice', 'Events', 'Introductions'];
+const chatTags = ["General", "Questions", "Advice", "Events", "Introductions"];
 
 const upcomingEvents = [
   {
     id: 1,
-    title: 'Mental Health Workshop',
-    date: '2024-01-15',
-    time: '14:00',
-    location: 'Community Center'
+    title: "Mental Health Workshop",
+    date: "2024-01-15",
+    time: "14:00",
+    location: "Community Center",
   },
   {
     id: 2,
-    title: 'Networking Event',
-    date: '2024-01-18',
-    time: '18:30',
-    location: 'Downtown Hall'
-  }
+    title: "Networking Event",
+    date: "2024-01-18",
+    time: "18:30",
+    location: "Downtown Hall",
+  },
 ];
 
 const trendingPosts = [
   {
     id: 1,
-    author: { name: 'Sarah Johnson', avatar: '/placeholder.svg' },
-    timestamp: '2 hours ago',
-    tags: ['Mental Health'],
-    title: 'Supporting Youth in Crisis',
-    content: 'Sharing some insights from our recent youth crisis intervention training...',
+    author: { name: "Sarah Johnson", avatar: "/placeholder.svg" },
+    timestamp: "2 hours ago",
+    tags: ["🧠 Mindset & Ownership"],
+    title: "Supporting Youth in Crisis",
+    content:
+      "Sharing some insights from our recent youth crisis intervention training...",
     likes: 24,
     comments: 8,
-    saved: false
+    saved: false,
   },
   {
     id: 2,
-    author: { name: 'Mike Chen', avatar: '/placeholder.svg' },
-    timestamp: '4 hours ago',
-    tags: ['Healthcare'],
-    title: 'New Healthcare Guidelines',
-    content: 'The new guidelines for community healthcare workers are now available...',
+    author: { name: "Mike Chen", avatar: "/placeholder.svg" },
+    timestamp: "4 hours ago",
+    tags: ["📍Start Your Squat"],
+    title: "New Healthcare Guidelines",
+    content:
+      "The new guidelines for community healthcare workers are now available...",
     likes: 18,
     comments: 12,
-    saved: true
-  }
+    saved: true,
+  },
 ];
 
 const Dashboard = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [createPostOpen, setCreatePostOpen] = useState(false);
+  const [showAllTags, setShowAllTags] = useState(false);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [loadingTags, setLoadingTags] = useState(true);
+  const [errorTags, setErrorTags] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getTags = async () => {
+      setLoadingTags(true);
+      setErrorTags(null);
+      try {
+        const data = await fetchTags();
+        setTags(data);
+      } catch (err) {
+        setErrorTags("Failed to load tags");
+      } finally {
+        setLoadingTags(false);
+      }
+    };
+    getTags();
+  }, []);
+
+  const mainTags = showAllTags ? tags : tags.slice(0, 5);
 
   const filteredPosts = selectedTag
-    ? trendingPosts.filter(post => post.tags.includes(selectedTag))
+    ? trendingPosts.filter((post) => post.tags.includes(selectedTag))
     : trendingPosts;
 
   return (
@@ -90,7 +125,8 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Connect with fellow social care professionals and build a supportive community.
+                  Connect with fellow social care professionals and build a
+                  supportive community.
                 </p>
               </CardContent>
             </Card>
@@ -101,16 +137,38 @@ const Dashboard = () => {
                 <CardTitle className="text-lg">Main Topics</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {mainTags.map((tag) => (
+                {loadingTags && <p>Loading tags...</p>}
+                {errorTags && <p className="text-red-500">{errorTags}</p>}
+                {!loadingTags &&
+                  !errorTags &&
+                  mainTags.map((tag) => (
+                    <Button
+                      key={tag.id}
+                      variant={selectedTag === tag.name ? "default" : "ghost"}
+                      className="w-full justify-start"
+                      onClick={() => setSelectedTag(tag.name)}
+                    >
+                      {tag.name}
+                    </Button>
+                  ))}
+                {!showAllTags && tags.length > 5 && (
                   <Button
-                    key={tag}
-                    variant={selectedTag === tag ? "default" : "ghost"}
-                    className="w-full justify-start"
-                    onClick={() => setSelectedTag(tag)}
+                    variant="outline"
+                    className="w-full justify-start text-xs mt-2"
+                    onClick={() => setShowAllTags(true)}
                   >
-                    {tag}
+                    More...
                   </Button>
-                ))}
+                )}
+                {showAllTags && tags.length > 5 && (
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-xs mt-2"
+                    onClick={() => setShowAllTags(false)}
+                  >
+                    Show Less
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
@@ -155,7 +213,8 @@ const Dashboard = () => {
                 Welcome to CUSP Community
               </h1>
               <p className="text-muted-foreground">
-                Connect, share, and grow with social care professionals worldwide.
+                Connect, share, and grow with social care professionals
+                worldwide.
               </p>
             </div>
 
@@ -172,9 +231,10 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">
-                      Thank you for joining CUSP! This platform is designed to help social care 
-                      professionals like you connect, share experiences, and support each other. 
-                      Start by creating your first post or exploring what others are sharing.
+                      Thank you for joining CUSP! This platform is designed to
+                      help social care professionals like you connect, share
+                      experiences, and support each other. Start by creating
+                      your first post or exploring what others are sharing.
                     </p>
                   </CardContent>
                 </Card>
@@ -191,7 +251,10 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {upcomingEvents.slice(0, 2).map((event) => (
-                      <div key={event.id} className="border rounded-lg p-3 space-y-1">
+                      <div
+                        key={event.id}
+                        className="border rounded-lg p-3 space-y-1"
+                      >
                         <h4 className="font-medium text-sm">{event.title}</h4>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
@@ -237,9 +300,11 @@ const Dashboard = () => {
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>
-                    {selectedTag ? `Posts tagged with "${selectedTag}"` : 'Trending Posts'}
+                    {selectedTag
+                      ? `Posts tagged with "${selectedTag}"`
+                      : "Trending Posts"}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="mt-2">
                     Discover what the community is talking about
                   </CardDescription>
                 </div>

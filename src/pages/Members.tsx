@@ -1,51 +1,84 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Search, Users, MapPin } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useEffect, useState } from "react";
+import { fetchTags, Tag } from "@/api/tags";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Search, Users, MapPin } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const mockMembers = [
   {
     id: 1,
-    name: 'Sarah Johnson',
-    email: 'sarah@example.com',
-    location: 'New York, NY',
-    profilePic: '/placeholder.svg',
-    tags: ['Mental Health', 'Counseling'],
-    joinedDate: '2023-06-15'
+    name: "Sarah Johnson",
+    email: "sarah@example.com",
+    location: "New York, NY",
+    profilePic: "/placeholder.svg",
+    tags: ["🧠 Mindset & Ownership", "📍Practice Growth & Marketing"],
+    joinedDate: "2023-06-15",
   },
   {
     id: 2,
-    name: 'Mike Chen',
-    email: 'mike@example.com',
-    location: 'Los Angeles, CA',
-    profilePic: '/placeholder.svg',
-    tags: ['Healthcare', 'Community'],
-    joinedDate: '2023-05-20'
+    name: "Mike Chen",
+    email: "mike@example.com",
+    location: "Los Angeles, CA",
+    profilePic: "/placeholder.svg",
+    tags: ["📍Start Your Squat", "💸 Budgeting & Finance"],
+    joinedDate: "2023-05-20",
   },
   {
     id: 3,
-    name: 'Emma Wilson',
-    email: 'emma@example.com',
-    location: 'Chicago, IL',
-    profilePic: '/placeholder.svg',
-    tags: ['Childcare', 'Education'],
-    joinedDate: '2023-07-02'
-  }
+    name: "Emma Wilson",
+    email: "emma@example.com",
+    location: "Chicago, IL",
+    profilePic: "/placeholder.svg",
+    tags: ["🎓 Education & Resources", "📍Interactive Map"],
+    joinedDate: "2023-07-02",
+  },
 ];
 
 const Members = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedMember, setSelectedMember] = useState<typeof mockMembers[0] | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedMember, setSelectedMember] = useState<
+    (typeof mockMembers)[0] | null
+  >(null);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [loadingTags, setLoadingTags] = useState(true);
+  const [errorTags, setErrorTags] = useState<string | null>(null);
 
-  const filteredMembers = mockMembers.filter(member =>
-    member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.location.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    const getTags = async () => {
+      setLoadingTags(true);
+      setErrorTags(null);
+      try {
+        const data = await fetchTags();
+        setTags(data);
+      } catch (err) {
+        setErrorTags("Failed to load tags");
+      } finally {
+        setLoadingTags(false);
+      }
+    };
+    getTags();
+  }, []);
+
+  const filteredMembers = mockMembers.filter(
+    (member) =>
+      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -56,9 +89,10 @@ const Members = () => {
           <h1 className="text-3xl font-bold text-foreground">Members</h1>
         </div>
         <p className="text-muted-foreground mb-4">
-          Connect with {mockMembers.length} social care professionals in our community
+          Connect with {mockMembers.length} social care professionals in our
+          community
         </p>
-        
+
         {/* Search */}
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -74,17 +108,26 @@ const Members = () => {
       {/* Members Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredMembers.map((member) => (
-          <Card key={member.id} className="hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => setSelectedMember(member)}>
+          <Card
+            key={member.id}
+            className="hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => setSelectedMember(member)}
+          >
             <CardContent className="p-6">
               <div className="flex items-center space-x-4 mb-4">
                 <Avatar className="h-16 w-16">
                   <AvatarImage src={member.profilePic} />
-                  <AvatarFallback className="text-lg">{member.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="text-lg">
+                    {member.name.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-lg truncate">{member.name}</h3>
-                  <p className="text-sm text-muted-foreground truncate">{member.email}</p>
+                  <h3 className="font-semibold text-lg truncate">
+                    {member.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground truncate">
+                    {member.email}
+                  </p>
                   <div className="flex items-center space-x-1 text-sm text-muted-foreground mt-1">
                     <MapPin className="h-3 w-3" />
                     <span className="truncate">{member.location}</span>
@@ -106,12 +149,17 @@ const Members = () => {
       {filteredMembers.length === 0 && (
         <div className="text-center py-12">
           <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">No members found matching your search.</p>
+          <p className="text-muted-foreground">
+            No members found matching your search.
+          </p>
         </div>
       )}
 
       {/* Member Details Modal */}
-      <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
+      <Dialog
+        open={!!selectedMember}
+        onOpenChange={() => setSelectedMember(null)}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Member Profile</DialogTitle>
@@ -121,11 +169,17 @@ const Members = () => {
               <div className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
                   <AvatarImage src={selectedMember.profilePic} />
-                  <AvatarFallback className="text-2xl">{selectedMember.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="text-2xl">
+                    {selectedMember.name.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="text-xl font-semibold">{selectedMember.name}</h3>
-                  <p className="text-muted-foreground">{selectedMember.email}</p>
+                  <h3 className="text-xl font-semibold">
+                    {selectedMember.name}
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {selectedMember.email}
+                  </p>
                   <div className="flex items-center space-x-1 text-muted-foreground mt-1">
                     <MapPin className="h-4 w-4" />
                     <span>{selectedMember.location}</span>
@@ -137,7 +191,9 @@ const Members = () => {
                 <h4 className="font-medium mb-2">Interests</h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedMember.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">{tag}</Badge>
+                    <Badge key={tag} variant="secondary">
+                      {tag}
+                    </Badge>
                   ))}
                 </div>
               </div>
@@ -145,17 +201,36 @@ const Members = () => {
               <div>
                 <h4 className="font-medium mb-2">Member Since</h4>
                 <p className="text-muted-foreground">
-                  {new Date(selectedMember.joinedDate).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
+                  {new Date(selectedMember.joinedDate).toLocaleDateString(
+                    "en-US",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }
+                  )}
                 </p>
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      {/* All Tags Section */}
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold mb-2">All Tags</h2>
+        {loadingTags && <span>Loading tags...</span>}
+        {errorTags && <span className="text-red-500">{errorTags}</span>}
+        {!loadingTags && !errorTags && (
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <Badge key={tag.id} variant="secondary">
+                {tag.name}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

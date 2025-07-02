@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,64 +6,87 @@
 @layer base {
   :root {
     --background: 210 40% 98%;
-    --foreground: 30 30% 15%;
+    --foreground: 0 0% 12%;
+    /* #1E1E1E */
 
     --card: 0 0% 100%;
-    --card-foreground: 30 30% 15%;
+    --card-foreground: 0 0% 12%;
+    /* #1E1E1E */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 30 30% 15%;
+    --popover-foreground: 270 79% 68%;
+    /* #FB7923 */
 
-    --primary: 48 76% 67%; /* #ECD465 */
-    --primary-foreground: 30 60% 12%;
+    --primary: 270 79% 68%;
+    /* #FB7923 */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 30 90% 28%; /* #925E02 */
-    --secondary-foreground: 48 76% 67%;
+    /* --secondary: 27 97% 57%; */
+    --secondary: 270 79% 68%;
+    /* #AB6AF0 */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96%;
+    --muted: 0 0% 18%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 48 76% 67%;
-    --accent-foreground: 30 60% 12%;
+    --accent: 270 79% 68%;
+    /* #FB7923 */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 27 97% 57%;
+    /* #FB7923 */
 
     --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 48 76% 67%;
+    /* #AB6AF0 */
+    --input: 270 79% 68%;
+    /* #AB6AF0 */
+    --ring: 270 79% 68%;
+    /* #AB6AF0 */
 
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 0 0% 12%; /* #1E1E1E */
-    --foreground: 48 76% 67%;
+    --background: 0 0% 12%;
+    /* #1E1E1E */
+    --foreground: 0 0% 100%;
 
     --card: 0 0% 15%;
-    --card-foreground: 48 76% 67%;
+    --card-foreground: 0 0% 100%;
+    /* #AB6AF0 */
 
     --popover: 0 0% 15%;
-    --popover-foreground: 48 76% 67%;
+    --popover-foreground: 270 79% 68%;
+    /* #AB6AF0 */
 
-    --primary: 48 76% 67%; /* #ECD465 */
-    --primary-foreground: 0 0% 12%;
-
-    --secondary: 30 90% 28%; /* #925E02 */
-    --secondary-foreground: 48 76% 67%;
+    --primary: 270 79% 68%;
+      /* #FB7923 */
+      --primary-foreground: 0 0% 100%;
+    
+      /* --secondary: 27 97% 57%; */
+      --secondary: 270 79% 68%;
+      /* #AB6AF0 */
+      --secondary-foreground: 0 0% 100%;
 
     --muted: 0 0% 18%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted-foreground: 0 0% 100%;
+    /* #AB6AF0 */
 
-    --accent: 0 0% 18%;
-    --accent-foreground: 48 76% 67%;
+    --accent: 270 79% 68%;
+    /* #FB7923 */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 270 79% 68%;
+    /* #AB6AF0 */
 
     --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 48 76% 67%;
+    /* #FB7923 */
+    --input: 270 79% 68%;
+      /* #AB6AF0 */
+      --ring: 270 79% 68%;
+      /* #AB6AF0 */
   }
 }
 
@@ -80,13 +102,25 @@
 
 /* Custom animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideIn {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
 
 .animate-fade-in {

@@ -79,7 +79,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       : "/cusp-logo-light.png"
                   }
                   alt="CUSP Logo"
-                  className="h-60"
+                  className="h-10"
                 />
               </div>
               {/* <span className="text-2xl font-bold text-primary">CUSP</span> */}

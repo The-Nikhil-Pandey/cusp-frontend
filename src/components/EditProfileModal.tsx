@@ -1,18 +1,37 @@
+import React, { useEffect, useState } from "react";
+import { fetchTags, Tag } from "@/api/tags";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { updateUserProfile } from "@/api/user";
 
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-
-const timezones = ['UTC', 'EST', 'CST', 'MST', 'PST', 'GMT', 'CET', 'JST', 'AEST', 'IST'];
-const socialCareOptions = [
-  'Healthcare', 'Counseling', 'Childcare', 'Elder Care', 'Mental Health',
-  'Disability Support', 'Social Work', 'Community Outreach', 'Education Support', 'Crisis Intervention'
+const timezones = [
+  "UTC",
+  "EST",
+  "CST",
+  "MST",
+  "PST",
+  "GMT",
+  "CET",
+  "JST",
+  "AEST",
+  "IST",
 ];
 
 interface EditProfileModalProps {
@@ -20,35 +39,89 @@ interface EditProfileModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const EditProfileModal: React.FC<EditProfileModalProps> = ({ open, onOpenChange }) => {
+const languages = [
+  "English",
+  "Hindi",
+  "Spanish",
+  "French",
+  "German",
+  "Chinese",
+  "Japanese",
+  "Arabic",
+  "Russian",
+  "Portuguese",
+];
+
+const EditProfileModal: React.FC<EditProfileModalProps> = ({
+  open,
+  onOpenChange,
+}) => {
   const { user, updateProfile } = useAuth();
   const { toast } = useToast();
-  
-  const [fullName, setFullName] = useState(user?.fullName || '');
-  const [jobTitle, setJobTitle] = useState(user?.jobTitle || '');
-  const [company, setCompany] = useState(user?.company || '');
-  const [timezone, setTimezone] = useState(user?.timezone || '');
-  const [selectedTags, setSelectedTags] = useState<string[]>(user?.socialCareWork || []);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+  const [fullName, setFullName] = useState(user?.fullName || "");
+  const [jobTitle, setJobTitle] = useState(user?.jobTitle || "");
+  const [company, setCompany] = useState(user?.company || "");
+  const [timezone, setTimezone] = useState(user?.timezone || "");
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    user?.socialCareWork || []
+  );
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
+    user?.tag_id || []
+  );
+  const [language, setLanguage] = useState(user?.language || "");
+  const [headline, setHeadline] = useState(user?.headline || "");
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [que1, setQue1] = useState(user?.que1 || "");
+  const [que2, setQue2] = useState(user?.que2 || "");
+  const [isLoading, setIsLoading] = useState(false);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [loadingTags, setLoadingTags] = useState(true);
+  const [errorTags, setErrorTags] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getTags = async () => {
+      setLoadingTags(true);
+      setErrorTags(null);
+      try {
+        const data = await fetchTags();
+        setTags(data);
+      } catch (err) {
+        setErrorTags("Failed to load tags");
+      } finally {
+        setLoadingTags(false);
+      }
+    };
+    getTags();
+  }, []);
+
+  const toggleTag = (id: number) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(id) ? prev.filter((tid) => tid !== id) : [...prev, id]
     );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
-      await updateProfile({
-        fullName,
-        jobTitle,
-        company,
-        timezone,
-        socialCareWork: selectedTags
-      });
+      const formData = new FormData();
+      formData.append("fullName", fullName);
+      formData.append("jobTitle", jobTitle);
+      formData.append("company", company);
+      formData.append("timezone", timezone);
+      formData.append("tag_id", JSON.stringify(selectedTagIds));
+      formData.append("language", language);
+      formData.append("headline", headline);
+      formData.append("phone", phone);
+      formData.append("que1", que1);
+      formData.append("que2", que2);
+
+      await updateUserProfile(
+        formData,
+        localStorage.getItem("cusp-token") || ""
+      );
+      console.log("token", localStorage.getItem("cusp-token"));
 
       toast({
         title: "Profile updated!",
@@ -69,7 +142,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ open, onOpenChange 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent
+        className="max-w-2xl max-h-[80vh] overflow-y-auto"
+        style={{ scrollbarWidth: "thin", scrollbarColor: "#ccc #f0f0f0" }}
+      >
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
         </DialogHeader>
@@ -112,7 +188,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ open, onOpenChange 
               </SelectTrigger>
               <SelectContent>
                 {timezones.map((tz) => (
-                  <SelectItem key={tz} value={tz}>{tz}</SelectItem>
+                  <SelectItem key={tz} value={tz}>
+                    {tz}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -121,19 +199,100 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ open, onOpenChange 
           <div>
             <Label>Social Care Work</Label>
             <div className="mt-2 grid grid-cols-2 gap-2">
-              {socialCareOptions.map((option) => (
-                <div
-                  key={option}
-                  onClick={() => toggleTag(option)}
-                  className={`cursor-pointer p-2 rounded-md border text-sm transition-colors ${
-                    selectedTags.includes(option)
-                      ? 'bg-primary text-primary-foreground border-primary'
-                      : 'bg-background border-border hover:bg-accent'
-                  }`}
-                >
-                  {option}
-                </div>
-              ))}
+              {loadingTags && <span>Loading tags...</span>}
+              {errorTags && <span className="text-red-500">{errorTags}</span>}
+              {!loadingTags &&
+                !errorTags &&
+                tags.map((option) => (
+                  <div
+                    key={option.id}
+                    onClick={() => toggleTag(option.id)}
+                    className={`cursor-pointer p-2 rounded-md border text-sm transition-colors ${
+                      selectedTagIds.includes(option.id)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background border-border hover:bg-accent hover:text-accent-foreground"
+                    }`}
+                  >
+                    {option.name}
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Language */}
+          <div>
+            <Label>Language</Label>
+            <Select value={language} onValueChange={setLanguage}>
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang} value={lang}>
+                    {lang}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Headline */}
+          <div>
+            <Label htmlFor="headline">Headline</Label>
+            <Input
+              id="headline"
+              value={headline}
+              onChange={(e) => setHeadline(e.target.value)}
+              placeholder="e.g., Passionate Social Worker, Community Leader"
+              className="mt-1"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="phone">Phone Number</Label>
+            <Input
+              id="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label>Are you planning to open a squat practice?</Label>
+            <div className="flex gap-2 mt-1">
+              <Button
+                type="button"
+                variant={que1 === "yes" ? "default" : "outline"}
+                onClick={() => setQue1("yes")}
+              >
+                Yes
+              </Button>
+              <Button
+                type="button"
+                variant={que1 === "no" ? "default" : "outline"}
+                onClick={() => setQue1("no")}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+          <div>
+            <Label>Are you a supplier?</Label>
+            <div className="flex gap-2 mt-1">
+              <Button
+                type="button"
+                variant={que2 === "yes" ? "default" : "outline"}
+                onClick={() => setQue2("yes")}
+              >
+                Yes
+              </Button>
+              <Button
+                type="button"
+                variant={que2 === "no" ? "default" : "outline"}
+                onClick={() => setQue2("no")}
+              >
+                No
+              </Button>
             </div>
           </div>
 
@@ -146,7 +305,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ open, onOpenChange 
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving...' : 'Save Changes'}
+              {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </form>

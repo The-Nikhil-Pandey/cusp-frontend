@@ -34,10 +34,12 @@ const Login = () => {
         description: "You've successfully logged in.",
       });
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Login failed",
-        description: "Please check your credentials and try again.",
+        description:
+          error?.response?.data?.msg ||
+          "Please check your credentials and try again.",
         variant: "destructive",
       });
     } finally {
@@ -59,7 +61,7 @@ const Login = () => {
       <div className="w-full max-w-md space-y-8 animate-fade-in">
         <div className="text-center">
           <div className="flex justify-center mb-2">
-            <div className=" h-16  rounded-lg flex items-center justify-center">
+            <div className="   rounded-lg flex items-center justify-center">
               {/* <span className="text-primary-foreground font-bold text-3xl">
                 C
               </span> */}
@@ -70,11 +72,12 @@ const Login = () => {
                     : "/cusp-logo-light.png"
                 }
                 alt="CUSP Logo"
+                className="h-14 "
               />
             </div>
           </div>
           {/* <h1 className="text-4xl font-bold text-primary mb-2">CUSP</h1> */}
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mt-6">
             Welcome back to your social care community
           </p>
         </div>

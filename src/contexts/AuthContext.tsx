@@ -1,10 +1,11 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { registerUser, loginUser } from "@/api";
 
 interface User {
   id: string;
   email: string;
   fullName: string;
+  password?: string; // Add password for temporary storage
   profileImage?: string;
   timezone?: string;
   jobTitle?: string;
@@ -12,6 +13,13 @@ interface User {
   socialCareWork?: string[];
   profileCompleted: boolean;
   joinedDate: string;
+  language?: string;
+  headline?: string;
+  // Added fields
+  phone?: string;
+  que1?: string;
+  que2?: string;
+  tag_id?: number[];
 }
 
 interface AuthContextType {
@@ -26,81 +34,133 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check for existing session
-    const savedUser = localStorage.getItem('cusp-user');
+    const savedUser = localStorage.getItem("cusp-user");
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      const parsedUser = JSON.parse(savedUser);
+      // Normalize socialCareWork to always be an array
+      let socialCareWork: string[] = [];
+      if (Array.isArray(parsedUser.socialCareWork)) {
+        socialCareWork = parsedUser.socialCareWork;
+      } else if (
+        typeof parsedUser.socialCareWork === "string" &&
+        parsedUser.socialCareWork.trim() !== ""
+      ) {
+        socialCareWork = [parsedUser.socialCareWork];
+      }
+      setUser({ ...parsedUser, socialCareWork });
     }
     setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
-    // API Call Here: /api/auth/login
-    // Simulate API call
-    const mockUser: User = {
-      id: '1',
-      email,
-      fullName: 'John Doe',
+    // Real API call
+    const res = await loginUser({ email, password });
+    const apiUser = res.user;
+    // Ensure socialCareWork is always an array
+    let socialCareWork: string[] = [];
+    if (Array.isArray(apiUser.socialCareWork)) {
+      socialCareWork = apiUser.socialCareWork;
+    } else if (
+      typeof apiUser.socialCareWork === "string" &&
+      apiUser.socialCareWork.trim() !== ""
+    ) {
+      socialCareWork = [apiUser.socialCareWork];
+    }
+    const user: User = {
+      id: apiUser.id.toString(),
+      email: apiUser.email,
+      fullName: apiUser.username,
+      profileImage: apiUser.profile_photo || undefined,
+      timezone: apiUser.timezone,
+      jobTitle: apiUser.job_title,
+      company: apiUser.company_name,
+      language: apiUser.language,
+      headline: apiUser.headline,
       profileCompleted: true,
-      joinedDate: new Date().toISOString(),
-      timezone: 'UTC',
-      jobTitle: 'Social Worker',
-      company: 'Care Corp',
-      socialCareWork: ['Healthcare', 'Counseling']
+      joinedDate: new Date().toISOString(), // You may want to use a real field
+      socialCareWork, // Always an array
     };
-    setUser(mockUser);
-    localStorage.setItem('cusp-user', JSON.stringify(mockUser));
+    setUser(user);
+    localStorage.setItem("cusp-user", JSON.stringify(user));
+    localStorage.setItem("cusp-token", res.token);
   };
 
   const signup = async (fullName: string, email: string, password: string) => {
-    // API Call Here: /api/auth/signup
-    const newUser: User = {
+    // No API call here now, just store in context for CompleteProfile
+    setUser({
       id: Date.now().toString(),
       email,
       fullName,
+      password, // Store password temporarily for CompleteProfile
       profileCompleted: false,
-      joinedDate: new Date().toISOString()
-    };
-    setUser(newUser);
-    localStorage.setItem('cusp-user', JSON.stringify(newUser));
+      joinedDate: new Date().toISOString(),
+      socialCareWork: [],
+      phone: "",
+      que1: "",
+      que2: "",
+      tag_id: [],
+    });
+    localStorage.setItem(
+      "cusp-user",
+      JSON.stringify({
+        id: Date.now().toString(),
+        email,
+        fullName,
+        password,
+        profileCompleted: false,
+        joinedDate: new Date().toISOString(),
+        socialCareWork: [],
+        phone: "",
+        que1: "",
+        que2: "",
+        tag_id: [],
+      })
+    );
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('cusp-user');
+    localStorage.removeItem("cusp-user");
   };
 
   const updateProfile = async (data: Partial<User>) => {
     if (user) {
       const updatedUser = { ...user, ...data };
       setUser(updatedUser);
-      localStorage.setItem('cusp-user', JSON.stringify(updatedUser));
+      localStorage.setItem("cusp-user", JSON.stringify(updatedUser));
     }
   };
 
   const completeProfile = async (data: Partial<User>) => {
     if (user) {
+      // Remove password from user after registration
       const updatedUser = { ...user, ...data, profileCompleted: true };
+      delete updatedUser.password;
       setUser(updatedUser);
-      localStorage.setItem('cusp-user', JSON.stringify(updatedUser));
+      localStorage.setItem("cusp-user", JSON.stringify(updatedUser));
     }
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      login,
-      signup,
-      logout,
-      updateProfile,
-      completeProfile,
-      isLoading
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        signup,
+        logout,
+        updateProfile,
+        completeProfile,
+        isLoading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -109,7 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

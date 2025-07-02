@@ -1,26 +1,34 @@
-
-import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import PostCard from './PostCard';
+import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import PostCard from "./PostCard";
 
 interface SavedPostsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const SavedPostsModal: React.FC<SavedPostsModalProps> = ({ open, onOpenChange }) => {
+const SavedPostsModal: React.FC<SavedPostsModalProps> = ({
+  open,
+  onOpenChange,
+}) => {
   const savedPosts = [
     {
       id: 1,
-      author: { name: 'Sarah Johnson', avatar: '/placeholder.svg' },
-      timestamp: '2 hours ago',
-      tags: ['Mental Health'],
-      title: 'Supporting Youth in Crisis',
-      content: 'Sharing some insights from our recent youth crisis intervention training...',
+      author: { name: "Sarah Johnson", avatar: "/placeholder.svg" },
+      timestamp: "2 hours ago",
+      tags: ["🧠 Mindset & Ownership"],
+      title: "Supporting Youth in Crisis",
+      content:
+        "Sharing some insights from our recent youth crisis intervention training...",
       likes: 24,
       comments: 8,
-      saved: true
-    }
+      saved: true,
+    },
   ];
 
   return (

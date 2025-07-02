@@ -1,9 +1,8 @@
-
-import React, { useState } from 'react';
-import { Heart, MessageCircle, Bookmark } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import React, { useState } from "react";
+import { Heart, MessageCircle, Bookmark } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Post {
   id: number;
@@ -33,7 +32,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const handleLike = () => {
     // API Call Here: /api/posts/like
     setLiked(!liked);
-    setLikeCount(prev => liked ? prev - 1 : prev + 1);
+    setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
   };
 
   const handleSave = () => {
@@ -93,10 +92,12 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             size="sm"
             onClick={handleLike}
             className={`flex items-center space-x-1 ${
-              liked ? 'text-red-500 hover:text-red-600' : 'text-muted-foreground'
+              liked
+                ? "text-red-500 hover:text-red-600"
+                : "text-muted-foreground"
             }`}
           >
-            <Heart className={`h-4 w-4 ${liked ? 'fill-current' : ''}`} />
+            <Heart className={`h-4 w-4 ${liked ? "fill-current" : ""}`} />
             <span>{likeCount}</span>
           </Button>
           <Button
@@ -113,10 +114,12 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           size="sm"
           onClick={handleSave}
           className={`${
-            saved ? 'text-primary hover:text-primary/80' : 'text-muted-foreground'
+            saved
+              ? "text-primary hover:text-primary/80"
+              : "text-muted-foreground"
           }`}
         >
-          <Bookmark className={`h-4 w-4 ${saved ? 'fill-current' : ''}`} />
+          <Bookmark className={`h-4 w-4 ${saved ? "fill-current" : ""}`} />
         </Button>
       </div>
     </div>

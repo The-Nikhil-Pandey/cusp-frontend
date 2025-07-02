@@ -1,31 +1,56 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
-
-const availableTags = ['Healthcare', 'Mental Health', 'Community', 'Resources', 'Support', 'Education'];
+import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import { fetchTags, Tag } from "@/api/tags";
 
 interface CreatePostModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onOpenChange }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+const CreatePostModal: React.FC<CreatePostModalProps> = ({
+  open,
+  onOpenChange,
+}) => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [media, setMedia] = useState<FileList | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [loadingTags, setLoadingTags] = useState(true);
+  const [errorTags, setErrorTags] = useState<string | null>(null);
   const { toast } = useToast();
 
+  useEffect(() => {
+    const getTags = async () => {
+      setLoadingTags(true);
+      setErrorTags(null);
+      try {
+        const data = await fetchTags();
+        setTags(data);
+      } catch (err) {
+        setErrorTags("Failed to load tags");
+      } finally {
+        setLoadingTags(false);
+      }
+    };
+    getTags();
+  }, []);
+
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
@@ -36,16 +61,21 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onOpenChange })
     setIsLoading(true);
     try {
       // API Call Here: /api/posts/create
-      console.log('Creating post:', { title, description, selectedTags, media });
-      
+      console.log("Creating post:", {
+        title,
+        description,
+        selectedTags,
+        media,
+      });
+
       toast({
         title: "Post created!",
         description: "Your post has been shared with the community.",
       });
 
       // Reset form
-      setTitle('');
-      setDescription('');
+      setTitle("");
+      setDescription("");
       setSelectedTags([]);
       setMedia(null);
       onOpenChange(false);
@@ -106,16 +136,22 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onOpenChange })
           <div>
             <Label>Tags (Optional)</Label>
             <div className="mt-2 flex flex-wrap gap-2">
-              {availableTags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant={selectedTags.includes(tag) ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => toggleTag(tag)}
-                >
-                  {tag}
-                </Badge>
-              ))}
+              {loadingTags && <span>Loading tags...</span>}
+              {errorTags && <span className="text-red-500">{errorTags}</span>}
+              {!loadingTags &&
+                !errorTags &&
+                tags.map((tag) => (
+                  <Badge
+                    key={tag.id}
+                    variant={
+                      selectedTags.includes(tag.name) ? "default" : "outline"
+                    }
+                    className="cursor-pointer"
+                    onClick={() => toggleTag(tag.name)}
+                  >
+                    {tag.name}
+                  </Badge>
+                ))}
             </div>
           </div>
 
@@ -127,8 +163,11 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ open, onOpenChange })
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading || !title.trim() || !description.trim()}>
-              {isLoading ? 'Creating...' : 'Create Post'}
+            <Button
+              type="submit"
+              disabled={isLoading || !title.trim() || !description.trim()}
+            >
+              {isLoading ? "Creating..." : "Create Post"}
             </Button>
           </div>
         </form>

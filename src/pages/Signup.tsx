@@ -27,7 +27,6 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
       await signup(fullName, email, password);
       toast({
@@ -35,10 +34,12 @@ const Signup = () => {
         description: "Please complete your profile setup.",
       });
       navigate("/complete-profile");
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Signup failed",
-        description: "Please try again with different credentials.",
+        description:
+          error?.response?.data?.msg ||
+          "Please try again with different credentials.",
         variant: "destructive",
       });
     } finally {
