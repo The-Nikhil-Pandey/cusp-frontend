@@ -19,9 +19,26 @@ import {
   X,
 } from "lucide-react";
 import CreatePostModal from "@/components/CreatePostModal";
-import PostCard from "@/components/PostCard";
 import { fetchTags, Tag } from "@/api/tags";
+import { fetchPosts, Post as ApiPost } from "@/api/post";
+import PostCard from "@/components/PostCard";
 import * as Select from "@radix-ui/react-select";
+
+interface PostCardPost {
+  id: number;
+  author: {
+    name: string;
+    avatar: string;
+  };
+  timestamp: string;
+  tags: string[];
+  title: string;
+  content: string;
+  likes: number;
+  comments: number;
+  saved: boolean;
+  media?: string[];
+}
 
 const chatTags = ["General", "Questions", "Advice", "Events", "Introductions"];
 
@@ -42,32 +59,7 @@ const upcomingEvents = [
   },
 ];
 
-const trendingPosts = [
-  {
-    id: 1,
-    author: { name: "Sarah Johnson", avatar: "/placeholder.svg" },
-    timestamp: "2 hours ago",
-    tags: ["🧠 Mindset & Ownership"],
-    title: "Supporting Youth in Crisis",
-    content:
-      "Sharing some insights from our recent youth crisis intervention training...",
-    likes: 24,
-    comments: 8,
-    saved: false,
-  },
-  {
-    id: 2,
-    author: { name: "Mike Chen", avatar: "/placeholder.svg" },
-    timestamp: "4 hours ago",
-    tags: ["📍Start Your Squat"],
-    title: "New Healthcare Guidelines",
-    content:
-      "The new guidelines for community healthcare workers are now available...",
-    likes: 18,
-    comments: 12,
-    saved: true,
-  },
-];
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, "");
 
 const Dashboard = () => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
@@ -78,6 +70,9 @@ const Dashboard = () => {
   const [errorTags, setErrorTags] = useState<string | null>(null);
   const [tagDropdownOpen, setTagDropdownOpen] = useState(false);
   const tagDropdownRef = useRef<HTMLDivElement>(null);
+  const [posts, setPosts] = useState<PostCardPost[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+  const [errorPosts, setErrorPosts] = useState<string | null>(null);
 
   useEffect(() => {
     const getTags = async () => {
@@ -95,11 +90,50 @@ const Dashboard = () => {
     getTags();
   }, []);
 
+  useEffect(() => {
+    const getPosts = async () => {
+      setLoadingPosts(true);
+      setErrorPosts(null);
+      try {
+        const data: ApiPost[] = await fetchPosts();
+        const mapped: PostCardPost[] = data.map((item) => ({
+          id: item.id,
+          author: {
+            name: item.username,
+            avatar: "/placeholder.svg",
+          },
+          timestamp: new Date(item.created_at).toLocaleString(),
+          tags: item.tags.map((t) => t.tag_title),
+          title: item.title,
+          content: item.description,
+          likes: Number(item.likes),
+          comments: Number(item.comments),
+          saved: false,
+          media: item.uploads
+            ? item.uploads
+                .map((u) =>
+                  u.image || u.video
+                    ? `${API_BASE_URL}${u.image || u.video}`
+                    : null
+                )
+                .filter(Boolean)
+            : [],
+        }));
+        setPosts(mapped);
+      } catch (err) {
+        setErrorPosts("Failed to load posts");
+      } finally {
+        setLoadingPosts(false);
+      }
+    };
+    getPosts();
+  }, []);
+
   const mainTags = showAllTags ? tags : tags.slice(0, 5);
 
   const filteredPosts = selectedTag
-    ? trendingPosts.filter((post) => post.tags.includes(selectedTag))
-    : trendingPosts;
+    ? posts.filter((post) => post.tags.includes(selectedTag))
+    : posts;
 
   // Responsive helpers
   const [isMobile, setIsMobile] = useState(false);
@@ -447,10 +481,14 @@ const Dashboard = () => {
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                {filteredPosts.map((post) => (
-                  <PostCard key={post.id} post={post} />
-                ))}
-                {filteredPosts.length === 0 && (
+                {loadingPosts && <p>Loading posts...</p>}
+                {errorPosts && <p className="text-red-500">{errorPosts}</p>}
+                {!loadingPosts &&
+                  !errorPosts &&
+                  filteredPosts.map((post) => (
+                    <PostCard key={post.id} post={post} />
+                  ))}
+                {!loadingPosts && !errorPosts && filteredPosts.length === 0 && (
                   <p className="text-center text-muted-foreground py-8">
                     No posts found for the selected tag.
                   </p>
@@ -512,10 +550,14 @@ const Dashboard = () => {
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
-              {filteredPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-              {filteredPosts.length === 0 && (
+              {loadingPosts && <p>Loading posts...</p>}
+              {errorPosts && <p className="text-red-500">{errorPosts}</p>}
+              {!loadingPosts &&
+                !errorPosts &&
+                filteredPosts.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+              {!loadingPosts && !errorPosts && filteredPosts.length === 0 && (
                 <p className="text-center text-muted-foreground py-8">
                   No posts found for the selected tag.
                 </p>

@@ -1,6 +1,22 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { registerUser, loginUser } from "@/api";
 
+interface TagDetail {
+  id: number;
+  name: string;
+}
+
+interface SavedPostTitle {
+  id: number;
+  title: string;
+}
+
+interface UserComment {
+  id: number;
+  post_id: string;
+  comment_text: string;
+}
+
 interface User {
   id: string;
   email: string;
@@ -20,6 +36,17 @@ interface User {
   que1?: string;
   que2?: string;
   tag_id?: number[];
+  tag_details?: TagDetail[];
+  post_ids?: string[];
+  comment_id?: string;
+  user_comments?: UserComment[];
+  rewards_id?: string;
+  save_id?: number;
+  saved_post_ids?: string[];
+  saved_post_titles?: SavedPostTitle[];
+  user_likes?: number[];
+  address?: string; // Added address field
+  updated_at?: string;
 }
 
 interface AuthContextType {
@@ -84,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     // Convert tag_id to array of numbers
     let tag_id: number[] = [];
     if (Array.isArray(apiUser.tag_id)) {
-      tag_id = apiUser.tag_id;
+      tag_id = apiUser.tag_id.map((id: any) => Number(id));
     } else if (
       typeof apiUser.tag_id === "string" &&
       apiUser.tag_id.trim() !== ""
@@ -92,26 +119,86 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       tag_id = apiUser.tag_id
         .split(",")
         .map((id: string) => Number(id.trim()))
-        .filter(Boolean);
+        .filter((id: number) => !isNaN(id));
     }
 
+    // Parse tag_details
+    let tag_details: TagDetail[] = Array.isArray(apiUser.tag_details)
+      ? apiUser.tag_details.map((t: any) => ({
+          id: Number(t.id),
+          name: t.name,
+        }))
+      : [];
+
+    // Parse saved_post_titles
+    let saved_post_titles: SavedPostTitle[] = Array.isArray(
+      apiUser.saved_post_titles
+    )
+      ? apiUser.saved_post_titles.map((t: any) => ({
+          id: Number(t.id),
+          title: t.title,
+        }))
+      : [];
+
+    // Parse user_comments
+    let user_comments: UserComment[] = Array.isArray(apiUser.user_comments)
+      ? apiUser.user_comments.map((c: any) => ({
+          id: Number(c.id),
+          post_id: c.post_id,
+          comment_text: c.comment_text,
+        }))
+      : [];
+
+    // Parse saved_post_ids
+    let saved_post_ids: string[] = Array.isArray(apiUser.saved_post_ids)
+      ? apiUser.saved_post_ids.map((id: any) => id.toString())
+      : [];
+
+    // Parse user_likes
+    let user_likes: number[] = Array.isArray(apiUser.user_likes)
+      ? apiUser.user_likes.map((id: any) => Number(id))
+      : [];
+
+    // Parse post_ids
+    let post_ids: string[] = Array.isArray(apiUser.post_ids)
+      ? apiUser.post_ids.map((id: any) => id.toString())
+      : [];
+
+    // Use created_at as joinedDate if available
+    let joinedDate = apiUser.created_at
+      ? new Date(apiUser.created_at).toISOString()
+      : new Date().toISOString();
+
+    // Save all available fields from API
     const user: User = {
-      id: apiUser.id.toString(),
-      email: apiUser.email,
-      fullName: apiUser.username,
+      id: apiUser.id?.toString() || "",
+      email: apiUser.email || "",
+      fullName: apiUser.username || "",
       profileImage,
-      timezone: apiUser.timezone,
-      jobTitle: apiUser.job_title,
-      company: apiUser.company_name,
-      language: apiUser.language,
-      headline: apiUser.headline,
+      timezone: apiUser.timezone || "",
+      jobTitle: apiUser.job_title || "",
+      company: apiUser.company_name || "",
+      language: apiUser.language || "",
+      headline: apiUser.headline || "",
       profileCompleted: true,
-      joinedDate: new Date().toISOString(), // You may want to use a real field
+      joinedDate,
       socialCareWork, // Always an array
       phone: apiUser.phone || "",
       que1: apiUser.que1 || "",
       que2: apiUser.que2 || "",
       tag_id,
+      tag_details,
+      post_ids,
+      comment_id: apiUser.comment_id || "",
+      user_comments,
+      rewards_id: apiUser.rewards_id || "",
+      save_id: apiUser.save_id ? Number(apiUser.save_id) : undefined,
+      saved_post_ids,
+      saved_post_titles,
+      user_likes,
+      address: apiUser.address || "",
+      updated_at: apiUser.updated_at || undefined,
+      // Add any other fields from API as needed
     };
     setUser(user);
     localStorage.setItem("cusp-user", JSON.stringify(user));
@@ -124,7 +211,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       id: Date.now().toString(),
       email,
       fullName,
-      password, // Store password temporarily for CompleteProfile
+      password: password, // Store password temporarily for CompleteProfile
       profileCompleted: false,
       joinedDate: new Date().toISOString(),
       socialCareWork: [],

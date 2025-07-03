@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { updateUserProfile } from "@/api/user";
+import { X } from "lucide-react";
 
 const timezones = [
   "UTC",
@@ -72,12 +73,18 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const [language, setLanguage] = useState(user?.language || "");
   const [headline, setHeadline] = useState(user?.headline || "");
   const [phone, setPhone] = useState(user?.phone || "");
+  const [address, setAddress] = useState(user?.address || "");
   const [que1, setQue1] = useState(user?.que1 || "");
   const [que2, setQue2] = useState(user?.que2 || "");
   const [isLoading, setIsLoading] = useState(false);
   const [tags, setTags] = useState<Tag[]>([]);
   const [loadingTags, setLoadingTags] = useState(true);
   const [errorTags, setErrorTags] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    user?.profileImage || null
+  );
+  const [imageError, setImageError] = useState<string>("");
 
   useEffect(() => {
     const getTags = async () => {
@@ -101,6 +108,32 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     );
   };
 
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImageError("");
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        setImageError("Please select a valid image file.");
+        return;
+      }
+      if (file.size > 3 * 1024 * 1024) {
+        setImageError("Image size should not exceed 3MB.");
+        return;
+      }
+      setProfileImage(file);
+      setProfileImagePreview(URL.createObjectURL(file));
+    } else {
+      setProfileImage(null);
+      setProfileImagePreview(user?.profileImage || null);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setProfileImage(null);
+    setProfileImagePreview(null);
+    setImageError("");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -114,8 +147,12 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       formData.append("language", language);
       formData.append("headline", headline);
       formData.append("phone", phone);
+      formData.append("address", address);
       formData.append("que1", que1);
       formData.append("que2", que2);
+      if (profileImage) {
+        formData.append("profileImage", profileImage);
+      }
 
       await updateUserProfile(
         formData,
@@ -150,6 +187,39 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           <DialogTitle>Edit Profile</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Profile Image */}
+          <div>
+            <Label htmlFor="profileImage">Profile Image (Optional)</Label>
+            <Input
+              id="profileImage"
+              type="file"
+              accept="image/*"
+              onChange={handleProfileImageChange}
+              className="mt-1"
+              disabled={!!profileImage}
+            />
+            {imageError && (
+              <div className="text-red-500 text-xs mt-1">{imageError}</div>
+            )}
+            {profileImagePreview && (
+              <div className="relative mt-3 w-32 h-32 rounded-lg overflow-hidden border border-primary/30 bg-muted flex items-center justify-center">
+                <img
+                  src={profileImagePreview}
+                  alt="Profile Preview"
+                  className="object-cover w-full h-full"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="absolute top-1 right-1 bg-background rounded-full p-1 shadow hover:bg-primary/10 transition"
+                  aria-label="Remove image"
+                >
+                  <X className="h-4 w-4 text-destructive" />
+                </button>
+              </div>
+            )}
+          </div>
+
           <div>
             <Label htmlFor="fullName">Full Name</Label>
             <Input
@@ -254,9 +324,23 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               id="phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="mt-1"
+              placeholder="e.g., +91 9876543210"
+              className="mt-1 bg-background border border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
             />
           </div>
+
+          <div>
+            <Label htmlFor="address">Address</Label>
+            <Input
+              id="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter your address"
+              className="mt-1 bg-background border border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+              required
+            />
+          </div>
+
           <div>
             <Label>Are you planning to open a squat practice?</Label>
             <div className="flex gap-2 mt-1">

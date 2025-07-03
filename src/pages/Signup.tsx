@@ -19,6 +19,7 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { signup } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -57,12 +58,11 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-8 animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center bg-background px-2 py-6 sm:px-4 md:px-6">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl space-y-8 animate-fade-in">
         <div className="text-center">
           <div className="flex justify-center mb-2">
-            <div className="h-16 rounded-lg flex items-center justify-center">
-              {/* <span className="text-primary-foreground font-bold text-3xl">C</span> */}
+            <div className="h-12 sm:h-16 rounded-lg flex items-center justify-center">
               <img
                 src={
                   theme === "dark"
@@ -70,11 +70,11 @@ const Signup = () => {
                     : "/cusp-logo-light.png"
                 }
                 alt="CUSP Logo"
+                className="h-10 sm:h-14 md:h-16 w-auto "
               />
             </div>
           </div>
-          {/* <h1 className="text-4xl font-bold text-primary mb-2">CUSP</h1> */}
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-base sm:text-lg">
             Join the social care community
           </p>
         </div>
@@ -112,15 +112,64 @@ const Signup = () => {
               </div>
               <div>
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={8}
-                  className="mt-1"
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    className="mt-1 pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground focus:outline-none"
+                    tabIndex={-1}
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      // Lucide EyeOff
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path d="M17.94 17.94A10.06 10.06 0 0 1 12 20C7 20 2.73 16.11 1 12c.73-1.67 1.87-3.21 3.32-4.47" />
+                        <path d="M9.53 9.53A3.5 3.5 0 0 1 12 8.5c1.93 0 3.5 1.57 3.5 3.5 0 .47-.09.92-.26 1.33" />
+                        <path d="M14.47 14.47A3.5 3.5 0 0 1 12 15.5c-1.93 0-3.5-1.57-3.5-3.5 0-.47.09-.92.26-1.33" />
+                        <line
+                          x1="2"
+                          x2="22"
+                          y1="2"
+                          y2="22"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    ) : (
+                      // Lucide Eye
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M2 12S5.818 5 12 5s10 7 10 7-3.818 7-10 7S2 12 2 12z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating Account..." : "Create Account"}

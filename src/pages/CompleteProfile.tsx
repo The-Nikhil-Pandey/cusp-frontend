@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { fetchTags, Tag } from "@/api/tags";
+import { ArrowLeft, X } from "lucide-react";
 
 const timezones = [
   "UTC",
@@ -55,6 +56,9 @@ const CompleteProfile = () => {
   const navigate = useNavigate();
 
   const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    null
+  );
   const [timezone, setTimezone] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [company, setCompany] = useState("");
@@ -64,9 +68,11 @@ const CompleteProfile = () => {
   const [language, setLanguage] = useState("");
   const [headline, setHeadline] = useState("");
   const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [tags, setTags] = useState<Tag[]>([]);
   const [que1, setQue1] = useState<string>("");
   const [que2, setQue2] = useState<string>("");
+  const [imageError, setImageError] = useState<string>("");
 
   React.useEffect(() => {
     fetchTags().then(setTags);
@@ -87,6 +93,7 @@ const CompleteProfile = () => {
     language &&
     headline &&
     phone &&
+    address &&
     que1 &&
     que2;
 
@@ -107,6 +114,7 @@ const CompleteProfile = () => {
       formData.append("language", language);
       formData.append("headline", headline);
       formData.append("tag_id", JSON.stringify(selectedTagIds));
+      formData.append("address", address);
       formData.append("que1", que1);
       formData.append("que2", que2);
 
@@ -132,11 +140,48 @@ const CompleteProfile = () => {
     }
   };
 
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImageError("");
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        setImageError("Please select a valid image file.");
+        return;
+      }
+      if (file.size > 3 * 1024 * 1024) {
+        setImageError("Image size should not exceed 3MB.");
+        return;
+      }
+      setProfileImage(file);
+      setProfileImagePreview(URL.createObjectURL(file));
+    } else {
+      setProfileImage(null);
+      setProfileImagePreview(null);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setProfileImage(null);
+    setProfileImagePreview(null);
+    setImageError("");
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate(-1)}
+          className="rounded-full bg-background border border-primary/20 shadow transition-colors hover:bg-primary/10 hover:border-primary/40 focus:ring-2 focus:ring-primary/30"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="h-5 w-5 text-primary group-hover:text-primary-foreground transition-colors" />
+        </Button>
+      </div>
       <div className="w-full max-w-2xl space-y-8 animate-fade-in">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-primary mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-primary mb-2">
             Complete Your Profile
           </h1>
           <p className="text-muted-foreground">
@@ -161,18 +206,49 @@ const CompleteProfile = () => {
                   id="profileImage"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setProfileImage(e.target.files?.[0] || null)}
+                  onChange={handleProfileImageChange}
                   className="mt-1"
+                  disabled={!!profileImage}
                 />
+                {imageError && (
+                  <div className="text-red-500 text-xs mt-1">{imageError}</div>
+                )}
+                {profileImagePreview && (
+                  <div className="relative mt-3 w-32 h-32 rounded-lg overflow-hidden border border-primary/30 bg-muted flex items-center justify-center">
+                    <img
+                      src={profileImagePreview}
+                      alt="Profile Preview"
+                      className="object-cover w-full h-full"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleRemoveImage();
+                        // Also clear the file input value
+                        const input = document.getElementById(
+                          "profileImage"
+                        ) as HTMLInputElement | null;
+                        if (input) input.value = "";
+                      }}
+                      className="absolute top-1 right-1 bg-background rounded-full p-1 shadow hover:bg-primary/10 transition"
+                      aria-label="Remove image"
+                    >
+                      <X className="h-4 w-4 text-destructive" />
+                    </button>
+                  </div>
+                )}
               </div>
 
-              {/* Full Name (Pre-filled, read-only) */}
+              {/* Full Name (Editable) */}
               <div>
-                <Label>Full Name</Label>
+                <Label htmlFor="fullName">Full Name *</Label>
                 <Input
-                  value={user?.fullName || ""}
-                  readOnly
-                  className="mt-1 bg-muted"
+                  id="fullName"
+                  value={user?.fullName !== undefined ? user.fullName : ""}
+                  onChange={(e) => user && (user.fullName = e.target.value)}
+                  placeholder="Enter your full name"
+                  className="mt-1 bg-background border border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+                  required
                 />
               </div>
 
@@ -287,8 +363,22 @@ const CompleteProfile = () => {
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  placeholder="e.g., +91 9876543210"
                   required
-                  className="mt-1"
+                  className="mt-1 bg-background border border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+                />
+              </div>
+
+              {/* Address */}
+              <div>
+                <Label htmlFor="address">Address *</Label>
+                <Input
+                  id="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Enter your address"
+                  className="mt-1 bg-background border border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
+                  required
                 />
               </div>
 
