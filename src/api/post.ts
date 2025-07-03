@@ -1,3 +1,34 @@
+// Save a post
+export const savePost = async (post_id: string) => {
+  const token = localStorage.getItem("cusp-token");
+  const res = await axios.post(
+    `http://31.97.56.234:8000/api/save-post/`,
+    { post_id },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    }
+  );
+  return res.data;
+};
+
+// Unsave a post
+export const unsavePost = async (post_id: string) => {
+  const token = localStorage.getItem("cusp-token");
+  const res = await axios.post(
+    `http://31.97.56.234:8000/api/delete-post`,
+    { post_id },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    }
+  );
+  return res.data;
+};
 import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;

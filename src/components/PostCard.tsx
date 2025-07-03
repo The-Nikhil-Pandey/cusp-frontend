@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
-import { likePost } from "@/api/post";
+import { likePost, savePost, unsavePost } from "@/api/post";
 
 interface Post {
   id: number;
@@ -61,9 +61,23 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     }
   };
 
-  const handleSave = () => {
-    // API Call Here: /api/posts/save
-    setSaved(!saved);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const handleSave = async () => {
+    if (!user) return;
+    setSaveLoading(true);
+    try {
+      if (!saved) {
+        await savePost(post.id.toString());
+        setSaved(true);
+      } else {
+        await unsavePost(post.id.toString());
+        setSaved(false);
+      }
+    } catch (e) {
+      // Optionally show error toast
+    } finally {
+      setSaveLoading(false);
+    }
   };
 
   const openMediaModal = (idx: number) => {
@@ -252,7 +266,8 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           variant="ghost"
           size="sm"
           onClick={handleSave}
-          className={`$${
+          disabled={saveLoading}
+          className={`${
             saved
               ? "text-primary hover:text-primary/80"
               : "text-muted-foreground"
