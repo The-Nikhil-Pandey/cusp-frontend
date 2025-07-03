@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PostCommentsModal from "./PostCommentsModal";
 import { Heart, MessageCircle, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const [mediaModalOpen, setMediaModalOpen] = useState(false);
   const [mediaIndex, setMediaIndex] = useState(0);
   const [likeLoading, setLikeLoading] = useState(false);
+  const [commentsModalOpen, setCommentsModalOpen] = useState(false);
 
   const handleLike = async () => {
     if (!user) return;
@@ -257,10 +259,16 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             variant="ghost"
             size="sm"
             className="flex items-center space-x-1 text-muted-foreground"
+            onClick={() => setCommentsModalOpen(true)}
           >
             <MessageCircle className="h-4 w-4" />
             <span>{post.comments}</span>
           </Button>
+          <PostCommentsModal
+            open={commentsModalOpen}
+            onOpenChange={setCommentsModalOpen}
+            post={post}
+          />
         </div>
         <Button
           variant="ghost"
