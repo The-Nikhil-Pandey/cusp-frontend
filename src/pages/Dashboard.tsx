@@ -96,11 +96,12 @@ const Dashboard = () => {
       setErrorPosts(null);
       try {
         const data: ApiPost[] = await fetchPosts();
+
         const mapped: PostCardPost[] = data.map((item) => ({
           id: item.id,
           author: {
             name: item.username,
-            avatar: "/placeholder.svg",
+            avatar: item?.profile_photo,
           },
           timestamp: new Date(item.created_at).toLocaleString(),
           tags: item.tags.map((t) => t.tag_title),

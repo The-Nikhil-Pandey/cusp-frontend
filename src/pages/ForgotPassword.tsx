@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/contexts/ThemeContext";
+import { forgotPassword } from "@/api/userApi";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -24,17 +25,28 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      // API Call Here: /api/auth/forgot-password
-      console.log("Password reset requested for:", email);
-
-      toast({
-        title: "Reset email sent!",
-        description: "Please check your email for password reset OTP.",
-      });
-    } catch (error) {
+      const data = await forgotPassword(email);
+      if (data.status) {
+        toast({
+          title: "Reset email sent!",
+          description: "Please check your email for password reset OTP.",
+        });
+        // Redirect to reset-password route
+        window.location.href = "/reset-password";
+      } else {
+        toast({
+          title: "Error",
+          description:
+            data.message || "Failed to send reset email. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to send reset email. Please try again.",
+        description:
+          error?.response?.data?.message ||
+          "Failed to send reset email. Please try again.",
         variant: "destructive",
       });
     } finally {

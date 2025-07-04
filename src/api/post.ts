@@ -45,6 +45,7 @@ export interface PostTag {
 }
 
 export interface Post {
+  profile_photo: any;
   id: number;
   title: string;
   description: string;
@@ -65,7 +66,7 @@ export interface Post {
 
 export async function fetchPosts(): Promise<Post[]> {
   const res = await axios.get(`${API_BASE_URL}/post/`);
-  return res.data;
+  return res.data.reverse() as Post[];
 }
 
 export const createPost = async (formData: FormData) => {

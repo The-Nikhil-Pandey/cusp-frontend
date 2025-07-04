@@ -151,7 +151,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       formData.append("que1", que1);
       formData.append("que2", que2);
       if (profileImage) {
-        formData.append("profileImage", profileImage);
+        formData.append("profile_photo", profileImage);
       }
 
       await updateUserProfile(

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/contexts/ThemeContext";
+import { changePassword } from "@/api/userApi";
 
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
@@ -40,19 +41,26 @@ const ResetPassword = () => {
     setIsLoading(true);
 
     try {
-      // API Call Here: /api/auth/reset-password
-      console.log("Password reset:", { email, otp, newPassword });
-
-      toast({
-        title: "Password reset successful!",
-        description: "You can now sign in with your new password.",
-      });
-
-      navigate("/login");
-    } catch (error) {
+      const data = await changePassword(email, otp, newPassword);
+      if (data) {
+        toast({
+          title: "Password reset successful!",
+          description: "You can now sign in with your new password.",
+        });
+        navigate("/login");
+      } else {
+        toast({
+          title: "Reset failed",
+          description: data.message || "Please check your OTP and try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
       toast({
         title: "Reset failed",
-        description: "Please check your OTP and try again.",
+        description:
+          error?.response?.data?.message ||
+          "Please check your OTP and try again.",
         variant: "destructive",
       });
     } finally {

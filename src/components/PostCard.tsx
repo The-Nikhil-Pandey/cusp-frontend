@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PostCommentsModal from "./PostCommentsModal";
 import { Heart, MessageCircle, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { likePost, savePost, unsavePost } from "@/api/post";
+import { fetchUserById } from "@/api/userApi";
 
 interface Post {
   id: number;
@@ -29,10 +30,49 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const { user, updateProfile } = useAuth();
+  const [userLikes, setUserLikes] = useState<number[]>([]);
+  const [savedPostIds, setSavedPostIds] = useState<string[]>([]);
+  const [loadingUserData, setLoadingUserData] = useState(true);
+  const [showAllTags, setShowAllTags] = useState<{ [key: number]: boolean }>(
+    {}
+  );
+  const [showFullContent, setShowFullContent] = useState<{
+    [key: number]: boolean;
+  }>({});
+  const [showFullTitle, setShowFullTitle] = useState<{
+    [key: number]: boolean;
+  }>({});
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user?.id) return;
+      setLoadingUserData(true);
+      try {
+        const userData = await fetchUserById(user.id);
+        setUserLikes(userData.user_likes || []);
+        setSavedPostIds(userData.saved_post_ids || []);
+      } catch (e) {
+        console.error("Failed to fetch user data", e);
+      } finally {
+        setLoadingUserData(false);
+      }
+    };
+    fetchUserData();
+  }, [user?.id]);
+
   // Check if user has liked this post
-  const initialLiked = user?.user_likes?.includes(post.id) || false;
+  const initialLiked = userLikes.includes(post.id);
   const [liked, setLiked] = useState(initialLiked);
-  const [saved, setSaved] = useState(post.saved);
+  useEffect(() => {
+    setLiked(userLikes.includes(post.id));
+  }, [userLikes, post.id]);
+
+  const initialSaved = savedPostIds.includes(post.id.toString());
+  const [saved, setSaved] = useState(initialSaved);
+  useEffect(() => {
+    setSaved(savedPostIds.includes(post.id.toString()));
+  }, [savedPostIds, post.id]);
+
   const [likeCount, setLikeCount] = useState(post.likes);
   const [mediaModalOpen, setMediaModalOpen] = useState(false);
   const [mediaIndex, setMediaIndex] = useState(0);
@@ -47,12 +87,10 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     setLikeCount((prev) => (newLiked ? prev + 1 : prev - 1));
     try {
       await likePost(post.id.toString(), newLiked ? "yes" : "no");
-      // Update user context for likes (optional, for instant UI update everywhere)
-      if (user.user_likes) {
-        let updatedLikes = newLiked
-          ? [...user.user_likes, post.id]
-          : user.user_likes.filter((id) => id !== post.id);
-        updateProfile({ user_likes: updatedLikes });
+      // Refetch user data to update likes
+      if (user.id) {
+        const userData = await fetchUserById(user.id);
+        setUserLikes(userData.user_likes || []);
       }
     } catch (e) {
       // Revert UI if API fails
@@ -70,10 +108,13 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     try {
       if (!saved) {
         await savePost(post.id.toString());
-        setSaved(true);
       } else {
         await unsavePost(post.id.toString());
-        setSaved(false);
+      }
+      // Refetch user data to update saved posts
+      if (user.id) {
+        const userData = await fetchUserById(user.id);
+        setSavedPostIds(userData.saved_post_ids || []);
       }
     } catch (e) {
       // Optionally show error toast
@@ -108,7 +149,9 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">
             <AvatarImage src={post.author.avatar} />
-            <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>
+              {post.author.name.charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
           <div>
             <p className="font-medium">{post.author.name}</p>
@@ -119,12 +162,47 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
       {/* Tags */}
       {post.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {post.tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
+        <div className="flex flex-wrap gap-1 relative">
+          {(() => {
+            const maxLines = 2;
+            const maxTagsPerLine = 4; // adjust as per your design
+            const maxTags = maxLines * maxTagsPerLine;
+            const showMore = post.tags.length > maxTags;
+            const visibleTags = showAllTags[post.id]
+              ? post.tags
+              : showMore
+              ? post.tags.slice(0, maxTags)
+              : post.tags;
+            return (
+              <>
+                {visibleTags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+                {showMore && !showAllTags[post.id] && (
+                  <span
+                    className="text-xs text-primary cursor-pointer underline ml-2"
+                    onClick={() =>
+                      setShowAllTags((prev) => ({ ...prev, [post.id]: true }))
+                    }
+                  >
+                    +{post.tags.length - maxTags} more
+                  </span>
+                )}
+                {showAllTags[post.id] && (
+                  <button
+                    className="block text-xs text-primary underline ml-2"
+                    onClick={() =>
+                      setShowAllTags((prev) => ({ ...prev, [post.id]: false }))
+                    }
+                  >
+                    Show less
+                  </button>
+                )}
+              </>
+            );
+          })()}
         </div>
       )}
 
@@ -234,8 +312,90 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
       {/* Content */}
       <div>
-        <h3 className="font-semibold mb-2">{post.title}</h3>
-        <p className="text-muted-foreground">{post.content}</p>
+        {post.title && post.title.length > 40 ? (
+          <div className="mb-2 text-lg font-semibold flex items-center">
+            {!showFullTitle[post.id] ? (
+              <span
+                className="truncate inline-block"
+                style={{
+                  maxWidth: "calc(100% - 40px)",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 1,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  verticalAlign: "middle",
+                }}
+                title={post.title}
+              >
+                {post.title}
+              </span>
+            ) : (
+              <span className="inline-block" title={post.title}>
+                {post.title}
+              </span>
+            )}
+            {!showFullTitle[post.id] && (
+              <span
+                className="text-xs text-primary cursor-pointer underline ml-1 whitespace-nowrap"
+                onClick={() =>
+                  setShowFullTitle((prev) => ({ ...prev, [post.id]: true }))
+                }
+                style={{ verticalAlign: "middle" }}
+              >
+                more
+              </span>
+            )}
+            {showFullTitle[post.id] && (
+              <span
+                className="text-xs text-primary cursor-pointer underline ml-1 whitespace-nowrap"
+                onClick={() =>
+                  setShowFullTitle((prev) => ({ ...prev, [post.id]: false }))
+                }
+                style={{ verticalAlign: "middle" }}
+              >
+                hide
+              </span>
+            )}
+          </div>
+        ) : (
+          <h2 className="font-semibold mb-2 text-lg" title={post.title}>
+            {post.title}
+          </h2>
+        )}
+        <p
+          className="text-muted-foreground text-sm"
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: showFullContent[post.id] ? "unset" : 4,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            whiteSpace: "pre-line",
+          }}
+        >
+          {post.content}
+        </p>
+        {post.content &&
+          post.content.split(/\r?\n| /).length > 30 &&
+          !showFullContent[post.id] && (
+            <span
+              className="text-xs text-primary cursor-pointer underline ml-1"
+              onClick={() =>
+                setShowFullContent((prev) => ({ ...prev, [post.id]: true }))
+              }
+            >
+              more
+            </span>
+          )}
+        {showFullContent[post.id] && (
+          <span
+            className="text-xs text-primary cursor-pointer underline ml-1"
+            onClick={() =>
+              setShowFullContent((prev) => ({ ...prev, [post.id]: false }))
+            }
+          >
+            hide
+          </span>
+        )}
       </div>
 
       {/* Actions */}
