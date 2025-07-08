@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { registerUser, loginUser } from "@/api";
+import { verifyToken } from "@/api/verifyToken";
 
 interface TagDetail {
   id: number;
@@ -85,6 +86,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser({ ...parsedUser, socialCareWork });
     }
     setIsLoading(false);
+
+    // Token verification interval
+    const interval = setInterval(async () => {
+      const token = localStorage.getItem("cusp-token");
+      if (token) {
+        const res = await verifyToken(token);
+        if (res.msg === "Invalid or expired token") {
+          logout();
+        }
+        // If valid, do nothing (or optionally update user info)
+      }
+    }, 60000); // 1 minute
+
+    return () => clearInterval(interval);
   }, []);
 
   const login = async (email: string, password: string) => {
