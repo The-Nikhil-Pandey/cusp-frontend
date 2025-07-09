@@ -67,6 +67,16 @@ const Events = () => {
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [selectedPastEvent, setSelectedPastEvent] = useState<any | null>(null);
 
+  // Scroll to top when a card is selected
+  const handleSelectEvent = (event: any) => {
+    setSelectedEvent(event);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const handleSelectPastEvent = (event: any) => {
+    setSelectedPastEvent(event);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("cusp-token");
     if (!token) {
@@ -135,7 +145,7 @@ const Events = () => {
                   <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-lg text-center px-2">
                     {selectedEvent.title}
                   </h2>
-                  <p className=" text-white/80 text-center">Next Event</p>
+                  {/* <p className=" text-white/80 text-center">Next Event</p> */}
                 </div>
               </div>
               <CardContent className="p-6">
@@ -173,7 +183,9 @@ const Events = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <Button className="w-full sm:w-auto">Register Now</Button>
+                      <Button className="w-full sm:w-auto mt-4">
+                        Register Now
+                      </Button>
                     </a>
                   </div>
                   <div className="bg-accent-foreground rounded-lg p-2 flex items-center justify-center w-full h-full min-h-[200px]">
@@ -209,7 +221,7 @@ const Events = () => {
                   <Card
                     key={event.id}
                     className="hover:shadow-lg transition-shadow cursor-pointer group relative overflow-hidden border border-border/60 bg-background/80 backdrop-blur-md"
-                    onClick={() => setSelectedEvent(event)}
+                    onClick={() => handleSelectEvent(event)}
                   >
                     <div
                       className="relative h-40 w-full bg-cover bg-center"
@@ -262,7 +274,7 @@ const Events = () => {
                           className="w-full mt-auto"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedEvent(event);
+                            handleSelectEvent(event);
                           }}
                         >
                           Learn More
@@ -290,10 +302,10 @@ const Events = () => {
                 }}
               >
                 <div className="text-center bg-black/40 w-full h-full flex flex-col items-center justify-center">
-                  <h2 className="text-2xl font-bold text-foreground mb-2">
+                  <h2 className="text-2xl font-bold text-foreground text-white mb-2">
                     {selectedPastEvent.title}
                   </h2>
-                  <p className="text-muted-foreground">Past Event</p>
+                  {/* <p className="text-muted-foreground">Past Event</p> */}
                 </div>
               </div>
               <CardContent className="p-6">
@@ -346,56 +358,76 @@ const Events = () => {
               </CardContent>
             </Card>
           )}
-          <h3 className="text-xl font-semibold">Past Events</h3>
-          <div className="space-y-4">
+          <h3 className="text-xl font-semibold mb-4">Past Events</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {pastEvents.length === 0 ? (
-              <div className="text-center text-muted-foreground py-8 text-lg font-medium">
+              <div className="text-center text-muted-foreground py-8 text-lg font-medium col-span-full">
                 No past events.
               </div>
             ) : (
               pastEvents.map((event) => (
                 <Card
                   key={event.id}
-                  className="hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => setSelectedPastEvent(event)}
+                  className="hover:shadow-lg transition-shadow cursor-pointer group relative overflow-hidden border border-border/60 bg-background/80 backdrop-blur-md"
+                  onClick={() => handleSelectPastEvent(event)}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <div
-                        className="w-full sm:w-24 h-24 rounded-lg flex items-center justify-center bg-cover bg-center"
-                        style={{
-                          backgroundImage: `url(${getEventImageUrl(
-                            event.event_image
-                          )})`,
+                  <div
+                    className="relative h-40 w-full bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url(${getEventImageUrl(
+                        event.event_image
+                      )})`,
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition" />
+                    <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+                      <h4
+                        className="font-semibold text-lg text-white drop-shadow mb-1 truncate"
+                        title={event.title}
+                      >
+                        {event.title}
+                      </h4>
+                      <div className="flex flex-wrap gap-1 mb-1">
+                        {event.event_tags &&
+                          event.event_tags.map((tag: string, idx: number) => (
+                            <Badge
+                              key={idx}
+                              variant="secondary"
+                              className="text-xs px-2 py-0.5"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                  <CardContent className="p-4">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Calendar className="h-3 w-3" />
+                        <span>
+                          {formatDate(event.date)} at {event.time}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <MapPin className="h-3 w-3" />
+                        <span className="truncate" title={event.location}>
+                          {event.location}
+                        </span>
+                      </div>
+                      <p className="text-xs text-foreground line-clamp-2 mb-2">
+                        {event.description}
+                      </p>
+                      <Button
+                        size="sm"
+                        className="w-full mt-auto"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectPastEvent(event);
                         }}
                       >
-                        {/* Empty for image bg */}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-lg mb-2">
-                          {event.title}
-                        </h4>
-                        <div className="space-y-1 text-sm text-muted-foreground mb-3">
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="h-3 w-3" />
-                            <span>{formatDate(event.date)}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <MapPin className="h-3 w-3" />
-                            <span>{event.location}</span>
-                          </div>
-                        </div>
-                        <p className="text-sm mb-3">{event.description}</p>
-                        <Button
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedPastEvent(event);
-                          }}
-                        >
-                          Learn More
-                        </Button>
-                      </div>
+                        Learn More
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
