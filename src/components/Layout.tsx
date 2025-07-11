@@ -11,6 +11,7 @@ import {
   LogOut,
   Settings,
   Eye,
+  Folder,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,7 +60,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: "Home", path: "/dashboard" },
     { name: "Events", path: "/events" },
     { name: "Members", path: "/members" },
-    { name: "Leaderboard", path: "/leaderboard" },
+    {
+      name: "Directories",
+      path: "/directories",
+    },
+    {
+      name: "Tools",
+      path: "/tools",
+    },
   ];
 
   return (

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,8 @@ import Dashboard from "@/pages/Dashboard";
 import Events from "@/pages/Events";
 import Members from "@/pages/Members";
 import Leaderboard from "@/pages/Leaderboard";
+import Directories from "@/pages/Directories";
+import Tools from "@/pages/Tools";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,41 +36,73 @@ const App = () => (
               <Route path="/signup" element={<Signup />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              
+
               {/* Profile completion (semi-private) */}
               <Route path="/complete-profile" element={<CompleteProfile />} />
-              
+
               {/* Protected routes */}
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={
-                <PrivateRoute>
-                  <Layout>
-                    <Dashboard />
-                  </Layout>
-                </PrivateRoute>
-              } />
-              <Route path="/events" element={
-                <PrivateRoute>
-                  <Layout>
-                    <Events />
-                  </Layout>
-                </PrivateRoute>
-              } />
-              <Route path="/members" element={
-                <PrivateRoute>
-                  <Layout>
-                    <Members />
-                  </Layout>
-                </PrivateRoute>
-              } />
-              <Route path="/leaderboard" element={
-                <PrivateRoute>
-                  <Layout>
-                    <Leaderboard />
-                  </Layout>
-                </PrivateRoute>
-              } />
-              
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Dashboard />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/events"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Events />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/members"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Members />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/leaderboard"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Leaderboard />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/directories"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Directories />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/tools"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Tools />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+
               {/* Catch-all */}
               <Route path="*" element={<NotFound />} />
             </Routes>
