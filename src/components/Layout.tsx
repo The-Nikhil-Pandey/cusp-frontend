@@ -39,6 +39,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import SearchModal from "./SearchModal";
 import NotificationsPanel from "./NotificationsPanel";
 import ChatPanel from "./ChatPanel";
+import ChatList from "./ChatList";
 import SavedPostsModal from "./SavedPostsModal";
 import UserProfileModal from "./UserProfileModal";
 import EditProfileModal from "./EditProfileModal";
@@ -157,7 +158,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <SheetHeader>
                     <SheetTitle>Messages</SheetTitle>
                   </SheetHeader>
-                  <ChatPanel />
+                  <ChatList />
                 </SheetContent>
               </Sheet>
 
