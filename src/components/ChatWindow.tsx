@@ -4,6 +4,7 @@ import { sendMessage, fetchChatHistory } from "@/api/chatApi";
 interface ChatWindowProps {
   user: { id: number; username: string };
   onClose: () => void;
+  senderId: number;
 }
 
 interface Message {
@@ -14,75 +15,39 @@ interface Message {
   mine?: boolean;
 }
 
-const WS_URL = "ws://31.97.56.234:8000/ws/chat";
-
-const ChatWindow: React.FC<ChatWindowProps> = ({ user, onClose }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ user, onClose, senderId }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [ws, setWs] = useState<WebSocket | null>(null);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Get sender id from token (assume userId is stored in localStorage)
-  const senderId = Number(localStorage.getItem("userId"));
-
+  // Polling for new messages every 3 seconds
   useEffect(() => {
-    let isMounted = true;
-    // Fetch chat history first
-    fetchChatHistory(user.id)
-      .then((data) => {
-        // Support both { messages: [...] } and [...]
+    let interval: NodeJS.Timeout;
+    const loadHistory = async () => {
+      try {
+        const data = await fetchChatHistory(user.id);
         let msgs = Array.isArray(data)
           ? data
           : Array.isArray(data?.messages)
           ? data.messages
           : [];
-        // Normalize to Message[]
         msgs = msgs.map((msg: any) => ({
           from: Number(msg.sender_id ?? msg.from),
           to: Number(msg.receiver_id ?? msg.to),
           message: msg.message,
           timestamp: msg.time || msg.timestamp || new Date().toISOString(),
-          // Mark as sent by me if sender_id matches my id
           mine: Number(msg.sender_id ?? msg.from) === Number(senderId),
         }));
-        if (isMounted) {
-          setMessages(msgs);
-        }
-      })
-      .catch(() => {});
-
-    // Open websocket connection
-    const socket = new window.WebSocket(`${WS_URL}/${senderId}/${user.id}`);
-    setWs(socket);
-
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data && data.message) {
-          setMessages((prev) => [
-            ...prev,
-            {
-              from: Number(data.sender_id ?? data.from),
-              to: Number(data.receiver_id ?? data.to),
-              message: data.message,
-              timestamp:
-                data.time || data.timestamp || new Date().toISOString(),
-              mine: Number(data.sender_id ?? data.from) === Number(senderId),
-            },
-          ]);
-        }
+        setMessages(msgs);
       } catch {}
     };
+    loadHistory();
+    interval = setInterval(loadHistory, 1000); // Poll every 3 seconds
+    return () => clearInterval(interval);
+  }, [user.id, senderId]);
 
-    return () => {
-      isMounted = false;
-      socket.close();
-    };
-    // eslint-disable-next-line
-  }, [user.id]);
-
-  // Always scroll to bottom on open and when messages change
+  // Always scroll to bottom when messages change
   useEffect(() => {
     setTimeout(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -93,33 +58,25 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ user, onClose }) => {
     if (!input.trim()) return;
     setSending(true);
     try {
-      // Send via websocket for real-time
-      ws?.send(
-        JSON.stringify({
-          from: senderId,
-          to: user.id,
-          message: input,
-        })
-      );
-      // Send via API for persistence
       await sendMessage(user.id, input);
-      // Immediately update UI for sender (so sender sees their own message instantly)
-      setMessages((prev) => [
-        ...prev,
-        {
-          from: senderId,
-          to: user.id,
-          message: input,
-          timestamp: new Date().toISOString(),
-          mine: true,
-        },
-      ]);
       setInput("");
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    } catch {
-      // Optionally show error
+      // Immediately reload chat after sending
+      const data = await fetchChatHistory(user.id);
+      let msgs = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.messages)
+        ? data.messages
+        : [];
+      msgs = msgs.map((msg: any) => ({
+        from: Number(msg.sender_id ?? msg.from),
+        to: Number(msg.receiver_id ?? msg.to),
+        message: msg.message,
+        timestamp: msg.time || msg.timestamp || new Date().toISOString(),
+        mine: Number(msg.sender_id ?? msg.from) === Number(senderId),
+      }));
+      setMessages(msgs);
+    } catch (err) {
+      alert("Failed to send message: " + err);
     } finally {
       setSending(false);
     }

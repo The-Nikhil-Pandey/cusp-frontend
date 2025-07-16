@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchAllUsers } from "@/api/userApi";
 import ChatWindow from "./ChatWindow";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface User {
   id: number;
@@ -9,6 +10,7 @@ interface User {
 }
 
 const ChatList: React.FC = () => {
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
@@ -107,8 +109,12 @@ const ChatList: React.FC = () => {
           )}
         </div>
       )}
-      {selectedUser && (
-        <ChatWindow user={selectedUser} onClose={() => setSelectedUser(null)} />
+      {selectedUser && user && (
+        <ChatWindow
+          user={selectedUser}
+          onClose={() => setSelectedUser(null)}
+          senderId={Number(user.id)}
+        />
       )}
     </div>
   );
