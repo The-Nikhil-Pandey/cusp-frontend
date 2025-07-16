@@ -18,6 +18,7 @@ import {
   ChevronDown,
   X,
 } from "lucide-react";
+import ReportPostModal from "@/components/ReportPostModal";
 import CreatePostModal from "@/components/CreatePostModal";
 import { fetchTags, Tag } from "@/api/tags";
 import { fetchPosts, Post as ApiPost } from "@/api/post";

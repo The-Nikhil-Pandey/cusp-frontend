@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { MoreVertical } from "lucide-react";
+import ReportPostModal from "./ReportPostModal";
 import PostCommentsModal from "./PostCommentsModal";
 import { Heart, MessageCircle, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,6 +38,8 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const [showAllTags, setShowAllTags] = useState<{ [key: number]: boolean }>(
     {}
   );
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [showFullContent, setShowFullContent] = useState<{
     [key: number]: boolean;
   }>({});
@@ -143,7 +147,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   };
 
   return (
-    <div className="border border-border rounded-lg p-4 space-y-3 hover:shadow-md transition-shadow">
+    <div className="border border-border rounded-lg p-4 space-y-3 hover:shadow-md transition-shadow relative">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
@@ -157,6 +161,29 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             <p className="font-medium">{post.author.name}</p>
             <p className="text-sm text-muted-foreground">{post.timestamp}</p>
           </div>
+        </div>
+        {/* More menu */}
+        <div className="relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <MoreVertical className="h-5 w-5" />
+          </Button>
+          {menuOpen && (
+            <div className="absolute right-0 top-10 z-10 bg-white border rounded shadow-md min-w-[120px]">
+              <button
+                className="w-full text-left px-4 py-2 hover:bg-accent text-sm"
+                onClick={() => {
+                  setReportModalOpen(true);
+                  setMenuOpen(false);
+                }}
+              >
+                Report
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -444,6 +471,12 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           <Bookmark className={`h-4 w-4 ${saved ? "fill-current" : ""}`} />
         </Button>
       </div>
+      {/* Report Modal */}
+      <ReportPostModal
+        open={reportModalOpen}
+        onOpenChange={setReportModalOpen}
+        postId={post.id}
+      />
     </div>
   );
 };
