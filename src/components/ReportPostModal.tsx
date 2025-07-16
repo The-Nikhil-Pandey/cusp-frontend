@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
@@ -87,11 +93,7 @@ const ReportPostModal: React.FC<ReportPostModalProps> = ({
           )}
         </div>
         <DialogFooter className="flex gap-2 mt-4">
-          <Button
-            className="flex-1"
-            onClick={handleReport}
-            disabled={loading}
-          >
+          <Button className="flex-1" onClick={handleReport} disabled={loading}>
             {loading ? "Reporting..." : "Submit Report"}
           </Button>
           <Button
