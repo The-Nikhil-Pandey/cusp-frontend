@@ -164,7 +164,7 @@ const Dashboard = () => {
   }, [tagDropdownOpen]);
 
   return (
-    <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4">
+    <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 ">
       {/* Welcome Message (always at top on mobile/tablet) */}
       <div className="block lg:hidden mb-4">
         <Card>
@@ -265,10 +265,10 @@ const Dashboard = () => {
       </div>
 
       {/* Desktop layout */}
-      <div className="hidden lg:grid grid-cols-4 gap-6">
+      <div className="hidden lg:grid grid-cols-4 gap-6 h-[calc(100vh-64px)]">
         {/* Sidebar */}
-        <div className="col-span-1">
-          <div className="space-y-6 sticky top-24">
+        <div className="col-span-1 h-full overflow-y-auto pr-2 hide-scrollbar">
+          <div className="space-y-6">
             {/* Feed Section */}
             <Card>
               <CardHeader>
@@ -372,7 +372,7 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="col-span-3">
+        <div className="col-span-3 h-full overflow-y-auto hide-scrollbar">
           <div className="space-y-6">
             {/* Banner */}
             <div className="bg-gradient-to-r from-primary/20 to-secondary/20 rounded-lg p-6">
@@ -386,7 +386,7 @@ const Dashboard = () => {
             </div>
 
             {/* Welcome Message & Upcoming Events */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1  gap-6">
               {/* Welcome Message */}
               <div className="lg:col-span-2">
                 <Card>
@@ -408,7 +408,7 @@ const Dashboard = () => {
               </div>
 
               {/* Upcoming Events (hide on <lg screens) */}
-              <div className="lg:col-span-1 hidden lg:block">
+              {/* <div className="lg:col-span-1 hidden lg:block">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -438,7 +438,7 @@ const Dashboard = () => {
                     </Button>
                   </CardContent>
                 </Card>
-              </div>
+              </div> */}
             </div>
 
             {/* More Events Cards */}
@@ -572,8 +572,8 @@ const Dashboard = () => {
       <CreatePostModal open={createPostOpen} onOpenChange={setCreatePostOpen} />
       {/* Hide scrollbar utility */}
       <style>{`
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hide-scrollbar::-webkit-scrollbar { display: none !important; }
+        .hide-scrollbar { -ms-overflow-style: none !important; scrollbar-width: none !important; }
       `}</style>
     </div>
   );

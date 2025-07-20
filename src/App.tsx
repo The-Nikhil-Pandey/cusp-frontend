@@ -18,7 +18,9 @@ import Members from "@/pages/Members";
 import Leaderboard from "@/pages/Leaderboard";
 import Directories from "@/pages/Directories";
 import Tools from "@/pages/Tools";
+
 import NotFound from "@/pages/NotFound";
+import Chats from "@/pages/Chats";
 
 const queryClient = new QueryClient();
 
@@ -92,12 +94,25 @@ const App = () => (
                   </PrivateRoute>
                 }
               />
+
               <Route
                 path="/tools"
                 element={
                   <PrivateRoute>
                     <Layout>
                       <Tools />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+
+              {/* Chats page */}
+              <Route
+                path="/chats"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Chats />
                     </Layout>
                   </PrivateRoute>
                 }

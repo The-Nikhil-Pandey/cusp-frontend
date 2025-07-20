@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { sendMessage, fetchChatHistory } from "@/api/chatApi";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface ChatWindowProps {
   user: { id: number; username: string };
@@ -20,6 +21,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ user, onClose, senderId }) => {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
 
   // Polling for new messages every 3 seconds
   useEffect(() => {
@@ -83,80 +85,80 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ user, onClose, senderId }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div
-        className="bg-background rounded-lg shadow-lg w-full max-w-md p-4 relative flex flex-col"
-        style={{ width: 400 }}
-      >
+    <div
+      className="bg-background rounded-lg shadow-lg w-full p-4 flex flex-col border"
+      style={{ minHeight: 400 }}
+    >
+      <div className="mb-2 font-semibold text-lg border-b pb-2 flex items-center gap-2">
+        <span className="rounded-full bg-primary text-primary-foreground px-2 py-1 text-sm">
+          {user.username[0].toUpperCase()}
+        </span>
+        <span>Chat with {user.username}</span>
         <button
-          className="absolute top-2 right-2 text-lg font-bold text-gray-500 hover:text-gray-800"
+          className="ml-auto text-muted-foreground hover:text-destructive px-2 py-1 rounded"
           onClick={onClose}
         >
-          ×
+          Close
         </button>
-        <div className="mb-2 font-semibold text-lg border-b pb-2 flex items-center gap-2">
-          <span className="rounded-full bg-primary text-primary-foreground px-2 py-1 text-sm">
-            {user.username[0].toUpperCase()}
-          </span>
-          <span>Chat with {user.username}</span>
-        </div>
-        <div
-          className="flex-1 overflow-y-auto border rounded p-2 mb-2 bg-muted"
-          style={{ minHeight: 320, maxHeight: 320 }}
-        >
-          {messages.length === 0 ? (
-            <div className="text-center text-muted-foreground text-sm mt-24">
-              No messages yet.
-            </div>
-          ) : (
-            messages.map((msg, idx) => (
+      </div>
+      <div
+        className="flex-1 overflow-y-auto border rounded p-2 mb-2 bg-muted"
+        style={{ minHeight: 320, maxHeight: 320 }}
+      >
+        {messages.length === 0 ? (
+          <div className="text-center text-muted-foreground text-sm mt-24">
+            No messages yet.
+          </div>
+        ) : (
+          messages.map((msg, idx) => (
+            <div
+              key={idx}
+              className={`mb-2 flex ${
+                msg.mine ? "justify-end" : "justify-start"
+              }`}
+            >
               <div
-                key={idx}
-                className={`mb-2 flex ${
-                  msg.mine ? "justify-end" : "justify-start"
+                className={`px-3 py-2 rounded-lg max-w-xs break-words shadow text-sm ${
+                  msg.mine
+                    ? "bg-primary text-primary-foreground"
+                    : theme === "dark"
+                    ? "bg-background text-foreground border"
+                    : "bg-white text-foreground border"
                 }`}
               >
-                <div
-                  className={`px-3 py-2 rounded-lg max-w-xs break-words shadow text-sm ${
-                    msg.mine
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-white text-foreground border"
-                  }`}
-                >
-                  {msg.message}
-                  <div className="text-[10px] text-right mt-1 opacity-60">
-                    {new Date(msg.timestamp).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </div>
+                {msg.message}
+                <div className="text-[10px] text-right mt-1 opacity-60">
+                  {new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </div>
               </div>
-            ))
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            className="flex-1 border rounded px-2 py-1"
-            placeholder="Type a message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSend();
-            }}
-            disabled={sending}
-            autoFocus
-          />
-          <button
-            className="bg-primary text-primary-foreground px-4 py-1 rounded disabled:opacity-60"
-            onClick={handleSend}
-            disabled={sending || !input.trim()}
-          >
-            Send
-          </button>
-        </div>
+            </div>
+          ))
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          className="flex-1 border rounded px-2 py-1"
+          placeholder="Type a message..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSend();
+          }}
+          disabled={sending}
+          autoFocus
+        />
+        <button
+          className="bg-primary text-primary-foreground px-4 py-1 rounded disabled:opacity-60"
+          onClick={handleSend}
+          disabled={sending || !input.trim()}
+        >
+          Send
+        </button>
       </div>
     </div>
   );

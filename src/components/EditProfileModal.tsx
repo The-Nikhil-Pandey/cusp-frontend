@@ -139,9 +139,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     setIsLoading(true);
     try {
       const formData = new FormData();
-      formData.append("fullName", fullName);
-      formData.append("jobTitle", jobTitle);
-      formData.append("company", company);
+      formData.append("username", fullName);
+      formData.append("job_title", jobTitle);
+      formData.append("company_name", company);
       formData.append("timezone", timezone);
       formData.append("tag_id", JSON.stringify(selectedTagIds));
       formData.append("language", language);

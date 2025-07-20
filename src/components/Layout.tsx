@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Search,
   Bell,
@@ -52,6 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [savedPostsOpen, setSavedPostsOpen] = useState(false);
   const [userProfileOpen, setUserProfileOpen] = useState(false);
@@ -124,7 +125,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </Button>
 
               {/* Notifications */}
-              <Sheet>
+              {/* <Sheet>
                 <SheetTrigger asChild>
                   <Button
                     variant="ghost"
@@ -141,19 +142,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   </SheetHeader>
                   <NotificationsPanel />
                 </SheetContent>
-              </Sheet>
+              </Sheet> */}
 
               {/* Chats */}
               <Sheet>
-                <SheetTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <MessageCircle className="h-5 w-5" />
-                  </Button>
-                </SheetTrigger>
+                {/* <SheetTrigger asChild> */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => navigate("/chats")}
+                >
+                  <MessageCircle className="h-5 w-5" />
+                </Button>
+                {/* </SheetTrigger> */}
                 <SheetContent>
                   <SheetHeader>
                     <SheetTitle>Messages</SheetTitle>
@@ -275,6 +277,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       className="justify-start text-muted-foreground hover:text-foreground"
                     >
                       <Bookmark className="h-5 w-5 mr-2" /> Saved Posts
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      onClick={() => navigate("/chats")}
+                      className="justify-start text-muted-foreground hover:text-foreground"
+                    >
+                      <MessageCircle className="h-5 w-5" /> Chats
                     </Button>
 
                     <Button

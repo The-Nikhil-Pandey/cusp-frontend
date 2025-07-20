@@ -9,13 +9,17 @@ interface User {
   [key: string]: any;
 }
 
-const ChatList: React.FC = () => {
+interface ChatListProps {
+  selectedUser?: User | null;
+  onUserSelect?: (user: User) => void;
+}
+
+const ChatList: React.FC<ChatListProps> = ({ selectedUser, onUserSelect }) => {
   const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   // Persist recent chats in localStorage
   const [recentChats, setRecentChats] = useState<User[]>(() => {
     const saved = localStorage.getItem("recentChats");
@@ -46,7 +50,7 @@ const ChatList: React.FC = () => {
 
   // Add user to recent chats if not already present
   const handleUserSelect = (user: User) => {
-    setSelectedUser(user);
+    if (onUserSelect) onUserSelect(user);
     setRecentChats((prev) => {
       if (prev.find((u) => u.id === user.id)) return prev;
       const updated = [user, ...prev];
@@ -71,6 +75,7 @@ const ChatList: React.FC = () => {
       />
 
       {/* Recent Chats always below search input */}
+
       {recentChats.length > 0 && (
         <div className="mt-2">
           <div className="mb-1 text-xs text-muted-foreground font-semibold">
@@ -80,8 +85,10 @@ const ChatList: React.FC = () => {
             {recentChats.map((user) => (
               <div
                 key={user.id}
-                className="p-2 border rounded cursor-pointer hover:bg-accent"
-                onClick={() => setSelectedUser(user)}
+                className={`p-2 border rounded cursor-pointer hover:bg-accent ${
+                  selectedUser?.id === user.id ? "bg-accent" : ""
+                }`}
+                onClick={() => handleUserSelect(user)}
               >
                 {user.username}
               </div>
@@ -100,7 +107,9 @@ const ChatList: React.FC = () => {
             filteredUsers.map((user) => (
               <div
                 key={user.id}
-                className="p-2 border rounded cursor-pointer hover:bg-accent"
+                className={`p-2 border rounded cursor-pointer hover:bg-accent ${
+                  selectedUser?.id === user.id ? "bg-accent" : ""
+                }`}
                 onClick={() => handleUserSelect(user)}
               >
                 {user.username}
@@ -108,13 +117,6 @@ const ChatList: React.FC = () => {
             ))
           )}
         </div>
-      )}
-      {selectedUser && user && (
-        <ChatWindow
-          user={selectedUser}
-          onClose={() => setSelectedUser(null)}
-          senderId={Number(user.id)}
-        />
       )}
     </div>
   );
