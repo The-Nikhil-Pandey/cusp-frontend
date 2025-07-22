@@ -60,7 +60,13 @@ interface AuthContextType {
   isLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export interface AuthContextTypeWithToken extends AuthContextType {
+  token?: string;
+}
+
+export const AuthContext = createContext<AuthContextTypeWithToken | undefined>(
+  undefined
+);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -103,6 +109,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const login = async (email: string, password: string) => {
+    if (email.trim().toLowerCase() === "admin@gmail.com") {
+      // Show error toast and block login
+      if (typeof window !== "undefined") {
+        import("../hooks/use-toast").then(({ useToast }) => {
+          const { toast } = useToast();
+          toast({
+            title: "Invalid login",
+            description: "This email is not allowed.",
+          });
+        });
+      }
+      throw new Error("Invalid login: This email is not allowed.");
+    }
     // Real API call
     const res = await loginUser({ email, password });
     const apiUser = res.user;
@@ -221,6 +240,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const signup = async (fullName: string, email: string, password: string) => {
+    if (email.trim().toLowerCase() === "admin@gmail.com") {
+      // Show error toast and block signup
+      if (typeof window !== "undefined") {
+        import("../hooks/use-toast").then(({ useToast }) => {
+          const { toast } = useToast();
+          toast({
+            title: "Invalid signup",
+            description: "This email is not allowed.",
+          });
+        });
+      }
+      throw new Error("Invalid signup: This email is not allowed.");
+    }
     // No API call here now, just store in context for CompleteProfile
     setUser({
       id: Date.now().toString(),
@@ -276,6 +308,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const token = localStorage.getItem("cusp-token") || undefined;
   return (
     <AuthContext.Provider
       value={{
@@ -286,6 +319,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         updateProfile,
         completeProfile,
         isLoading,
+        token,
       }}
     >
       {children}
@@ -293,10 +327,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-};
+}

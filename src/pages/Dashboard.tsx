@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -163,6 +164,7 @@ const Dashboard = () => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [tagDropdownOpen]);
 
+  const navigate = useNavigate();
   return (
     <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 ">
       {/* Welcome Message (always at top on mobile/tablet) */}
@@ -252,12 +254,26 @@ const Dashboard = () => {
         </Select.Root>
         {/* CUSP Chats */}
         <div className="flex gap-1 shrink-0">
-          {chatTags.map((tag) => (
-            <Button key={tag} variant="ghost" className="shrink-0" size="sm">
-              #{tag}
-            </Button>
-          ))}
+          {/* {chatTags.map((tag) => ( */}
+          <Button
+            variant="ghost"
+            className="shrink-0"
+            size="sm"
+            onClick={() => navigate("/resources")}
+          >
+            # Resources
+          </Button>
+          {/* ))} */}
         </div>
+
+        <Button
+          variant="ghost"
+          className="shrink-0"
+          onClick={() => navigate("/courses")}
+        >
+          Courses
+        </Button>
+
         {/* Community Guidelines */}
         <Button variant="link" className="shrink-0 p-0 h-auto text-primary">
           Community Guidelines
@@ -292,8 +308,8 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Connect with fellow social care professionals and build a
-                  supportive community.
+                  Connect with dental professional and build a supportive
+                  community.
                 </p>
               </CardContent>
             </Card>
@@ -342,18 +358,19 @@ const Dashboard = () => {
             {/* CUSP Chats */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">CUSP Chats</CardTitle>
+                <CardTitle className="text-lg">Special</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {chatTags.map((tag) => (
-                  <Button
-                    key={tag}
-                    variant="ghost"
-                    className="w-full justify-start"
-                  >
-                    # {tag}
-                  </Button>
-                ))}
+                {/* {chatTags.map((tag) => ( */}
+                <Button
+                  // key={tag}
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => navigate("/resources")}
+                >
+                  # Resources
+                </Button>
+                {/* ))} */}
               </CardContent>
             </Card>
 
@@ -363,6 +380,13 @@ const Dashboard = () => {
                 <CardTitle className="text-lg">Links</CardTitle>
               </CardHeader>
               <CardContent>
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/courses")}
+                  className="w-full justify-start"
+                >
+                  Courses
+                </Button>
                 <Button variant="link" className="p-0 h-auto text-primary">
                   Community Guidelines
                 </Button>
@@ -398,10 +422,10 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">
-                      Thank you for joining CUSP! This platform is designed to
-                      help social care professionals like you connect, share
-                      experiences, and support each other. Start by creating
-                      your first post or exploring what others are sharing.
+                      CUSP is where dental practice owners, managers, and
+                      support staff come together to build their dream squat
+                      clinics. Share your journey, learn from others, and grow
+                      alongside a community that gets it.
                     </p>
                   </CardContent>
                 </Card>

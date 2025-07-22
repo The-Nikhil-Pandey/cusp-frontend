@@ -19,10 +19,16 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { theme } = useTheme();
+
+  React.useEffect(() => {
+    if (user) {
+      navigate("/dashboard"); // or your desired route
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

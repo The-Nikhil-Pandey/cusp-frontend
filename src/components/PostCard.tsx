@@ -236,7 +236,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       {/* Media Collage */}
       {post.media && post.media.length > 0 && (
         <div className="w-full">
-          <div className="grid grid-cols-3 gap-1 rounded-lg overflow-hidden max-h-52 min-h-[120px]">
+          <div className="grid grid-cols-3 gap-1 rounded-lg overflow-hidden max-h-52  sm:min-h-[270px]">
             {post.media.slice(0, 3).map((url, idx) => (
               <div
                 key={url}

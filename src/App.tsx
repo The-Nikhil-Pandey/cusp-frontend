@@ -1,3 +1,4 @@
+import Learn from "@/pages/Learn";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +22,8 @@ import Tools from "@/pages/Tools";
 
 import NotFound from "@/pages/NotFound";
 import Chats from "@/pages/Chats";
+import Resources from "@/pages/Resources";
+import Courses from "@/pages/Courses";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +104,41 @@ const App = () => (
                   <PrivateRoute>
                     <Layout>
                       <Tools />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+
+              {/* Courses page */}
+              {/* Learn PPT page */}
+              <Route
+                path="/learn/:topicId"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Learn />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/courses"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Courses />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+
+              {/* Resources page */}
+              <Route
+                path="/resources"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Resources />
                     </Layout>
                   </PrivateRoute>
                 }

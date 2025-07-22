@@ -1,3 +1,35 @@
+// Delete a post by ID
+export const deletePost = async (post_id: string, token: string) => {
+  const res = await axios.delete(`${API_BASE_URL}/post/${post_id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return res.data;
+};
+
+// Update a post by ID (PATCH)
+export const updatePost = async (post_id: string, data: any, token: string) => {
+  const res = await axios.patch(`${API_BASE_URL}/post/${post_id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return res.data;
+};
+
+// Fetch a post by ID
+export const fetchPostById = async (post_id: string, token: string) => {
+  const res = await axios.get(`${API_BASE_URL}/post/${post_id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return res.data;
+};
 // Save a post
 export const savePost = async (post_id: string) => {
   const token = localStorage.getItem("cusp-token");
