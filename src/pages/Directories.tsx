@@ -33,7 +33,7 @@ const Directories: React.FC = () => {
               <img
                 src={
                   dir.p_photo
-                    ? `http://31.97.56.234:8000/uploads/${dir.p_photo}`
+                    ? `https://api.dreamsquats.co.uk/uploads/${dir.p_photo}`
                     : "/placeholder.svg"
                 }
                 alt={dir.p_name}

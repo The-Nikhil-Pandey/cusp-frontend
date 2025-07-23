@@ -10,7 +10,7 @@ export interface ToolEntry {
 }
 
 export async function fetchTools(): Promise<ToolEntry[]> {
-  const res = await fetch("http://31.97.56.234:8000/api/tools/");
+  const res = await fetch("https://api.dreamsquats.co.uk/api/tools/");
   if (!res.ok) throw new Error("Failed to fetch tools");
   return res.json();
 }

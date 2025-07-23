@@ -33,7 +33,7 @@ const Tools: React.FC = () => {
               <img
                 src={
                   tool.img_url
-                    ? `http://31.97.56.234:8000/uploads/${tool.img_url}`
+                    ? `https://api.dreamsquats.co.uk/uploads/${tool.img_url}`
                     : "/placeholder.svg"
                 }
                 alt={tool.title}

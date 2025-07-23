@@ -34,7 +34,7 @@ export const fetchPostById = async (post_id: string, token: string) => {
 export const savePost = async (post_id: string) => {
   const token = localStorage.getItem("cusp-token");
   const res = await axios.post(
-    `http://31.97.56.234:8000/api/save-post/`,
+    `https://api.dreamsquats.co.uk/api/save-post/`,
     { post_id },
     {
       headers: {
@@ -49,13 +49,16 @@ export const savePost = async (post_id: string) => {
 // Unsave a post
 export const unsavePost = async (post_id: string) => {
   const token = localStorage.getItem("cusp-token");
-  const res = await axios.delete(`http://31.97.56.234:8000/api/delete-post`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    data: { post_id },
-  });
+  const res = await axios.delete(
+    `https://api.dreamsquats.co.uk/api/delete-post`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      data: { post_id },
+    }
+  );
   return res.data;
 };
 import axios from "axios";

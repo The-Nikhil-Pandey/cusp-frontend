@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://31.97.56.234:8000/api";
+  import.meta.env.VITE_API_BASE_URL || "https://api.dreamsquats.co.uk/api";
 
 export const sendMessage = async (to: number, message: string) => {
   const token =

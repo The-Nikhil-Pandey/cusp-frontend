@@ -15,6 +15,8 @@ export interface DirectoryEntry {
 }
 
 export async function fetchDirectories(): Promise<DirectoryEntry[]> {
-  const response = await axios.get("http://31.97.56.234:8000/api/directory/");
+  const response = await axios.get(
+    "https://api.dreamsquats.co.uk/api/directory/"
+  );
   return response.data;
 }

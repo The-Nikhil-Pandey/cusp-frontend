@@ -33,8 +33,8 @@ const fileTypeIcon = (type: string) => {
   return <span>📁</span>;
 };
 
-const BASE_UPLOAD_URL = "http://31.97.56.234:8000/uploads/";
-// const BASE_API_URL = "http://31.97.56.234:8000/api/documents/";
+const BASE_UPLOAD_URL = "https://api.dreamsquats.co.uk/uploads/";
+// const BASE_API_URL = "https://api.dreamsquats.co.uk/api/documents/";
 
 const Resources = () => {
   // Edit modal state
