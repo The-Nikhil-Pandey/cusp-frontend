@@ -24,6 +24,7 @@ import NotFound from "@/pages/NotFound";
 import Chats from "@/pages/Chats";
 import Resources from "@/pages/Resources";
 import Courses from "@/pages/Courses";
+import Calc from "./pages/Calculator";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,16 @@ const App = () => (
                   <PrivateRoute>
                     <Layout>
                       <Members />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/calculator"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <Calc />
                     </Layout>
                   </PrivateRoute>
                 }
