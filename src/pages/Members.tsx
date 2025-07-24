@@ -176,7 +176,7 @@ const Members = () => {
         open={!!selectedMember}
         onOpenChange={() => setSelectedMember(null)}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[70vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Member Profile</DialogTitle>
           </DialogHeader>
@@ -209,7 +209,7 @@ const Members = () => {
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    {(!user ||
+                    {/* {(!user ||
                       String(user.id) !== String(selectedMember.id)) && (
                       <button
                         className="flex items-center gap-1 text-primary hover:text-primary/80 focus:outline-none"
@@ -222,7 +222,7 @@ const Members = () => {
                         <MessageCircle className="h-6 w-6" />
                         <span className="text-xs font-medium">Message</span>
                       </button>
-                    )}
+                    )} */}
                   </div>
                 </div>
                 <div>

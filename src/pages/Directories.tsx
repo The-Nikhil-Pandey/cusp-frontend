@@ -21,7 +21,7 @@ const Directories: React.FC = () => {
     <div className="max-w-5xl mx-auto p-4">
       <div className="flex items-center space-x-2 mb-4">
         <Folder className="h-8 w-8 text-primary" />
-        <h1 className="text-3xl font-bold text-foreground">Directories</h1>
+        <h1 className="text-3xl font-bold text-foreground">Suppliers</h1>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {directories.map((dir) => (
@@ -58,7 +58,7 @@ const Directories: React.FC = () => {
               <div className="font-medium">Location:</div>
               <div className="text-sm">{dir.location}</div>
             </div>
-            <div className="mt-2">
+            {/* <div className="mt-2">
               <iframe
                 src={
                   dir.location_url.includes("/maps")
@@ -73,7 +73,7 @@ const Directories: React.FC = () => {
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               ></iframe>
-            </div>
+            </div> */}
             <div className="text-xs text-muted-foreground mt-2">
               Created: {new Date(dir.created_at).toLocaleString()}
             </div>
