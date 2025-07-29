@@ -17,22 +17,25 @@ import { useTheme } from "@/contexts/ThemeContext";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { login, user } = useAuth();
+  const { login, user, token, isLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { theme } = useTheme();
 
   React.useEffect(() => {
-    if (user) {
-      navigate("/dashboard"); // or your desired route
+    if (isLoading) return;
+    if (token && user) {
+      navigate("/dashboard");
+    } else if (!token) {
+      navigate("/login");
     }
-  }, [user, navigate]);
+  }, [token, user, isLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setFormLoading(true);
 
     try {
       await login(email, password);
@@ -50,7 +53,7 @@ const Login = () => {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setFormLoading(false);
     }
   };
 
@@ -178,7 +181,7 @@ const Login = () => {
                 </Link>
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing In..." : "Sign In"}
+                {formLoading ? "Signing In..." : "Sign In"}
               </Button>
             </form>
 

@@ -13,6 +13,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "@/contexts/ThemeContext";
+import { googleSignUp } from "@/api/authApi";
 
 const Signup = () => {
   const [fullName, setFullName] = useState("");
@@ -49,12 +50,43 @@ const Signup = () => {
   };
 
   const handleGoogleSignUp = () => {
-    // API Call Here: /api/auth/google
-    console.log("Google Sign-Up initiated");
-    toast({
-      title: "Google Sign-Up",
-      description: "This feature will be implemented with backend integration.",
-    });
+    setIsLoading(true);
+    googleSignUp()
+      .then((data) => {
+        localStorage.setItem(
+          "cusp-user",
+          JSON.stringify({
+            id: data.user.id,
+            email: data.user.email,
+            fullName: data.user.username,
+            profileImage: data.user.profile_photo,
+            password: data.password,
+            profileCompleted: true,
+            joinedDate: new Date().toISOString(),
+            socialCareWork: [],
+            phone: "",
+            que1: "",
+            que2: "",
+            tag_id: [],
+          })
+        );
+        localStorage.setItem("cusp-token", data.token);
+        toast({
+          title: "Google Sign-Up Successful",
+          description: data.msg || "You are now signed up with Google.",
+        });
+        navigate("/dashboard");
+      })
+      .catch((error) => {
+        toast({
+          title: "Google Sign-Up Failed",
+          description: error.message || "Could not sign up with Google.",
+          variant: "destructive",
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -176,7 +208,7 @@ const Signup = () => {
               </Button>
             </form>
 
-            {/* <div className="mt-6">
+            <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-border"></div>
@@ -213,7 +245,7 @@ const Signup = () => {
                 </svg>
                 Sign up with Google
               </Button>
-            </div> */}
+            </div>
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
               Already have an account?{" "}
