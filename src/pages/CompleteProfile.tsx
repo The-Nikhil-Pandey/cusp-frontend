@@ -52,6 +52,7 @@ const languages = [
 
 const CompleteProfile = () => {
   const { user } = useAuth();
+  const [fullName, setFullName] = useState(user?.fullName || "");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -59,16 +60,16 @@ const CompleteProfile = () => {
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
     null
   );
-  const [timezone, setTimezone] = useState("");
+  const [timezone, setTimezone] = useState("BST");
   const [jobTitle, setJobTitle] = useState("");
-  const [company, setCompany] = useState("");
+  const [company, setCompany] = useState("N/A");
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [language, setLanguage] = useState("");
-  const [headline, setHeadline] = useState("");
+  const [language, setLanguage] = useState("English");
+  const [headline, setHeadline] = useState("N/A");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState("N/A");
   const [tags, setTags] = useState<Tag[]>([]);
   const [que1, setQue1] = useState<string>("");
   const [que2, setQue2] = useState<string>("");
@@ -87,13 +88,10 @@ const CompleteProfile = () => {
   const isFormValid =
     timezone &&
     jobTitle &&
-    company &&
     selectedTagIds.length > 0 &&
     agreedToTerms &&
     language &&
-    headline &&
     phone &&
-    address &&
     que1 &&
     que2;
 
@@ -102,8 +100,9 @@ const CompleteProfile = () => {
     if (!isFormValid) return;
     setIsLoading(true);
     try {
+      if (user) user.fullName = fullName;
       const formData = new FormData();
-      formData.append("username", user?.fullName || "");
+      formData.append("username", fullName);
       formData.append("email", user?.email || "");
       formData.append("password", user?.password || "");
       formData.append("phone", phone);
@@ -244,8 +243,8 @@ const CompleteProfile = () => {
                 <Label htmlFor="fullName">Full Name *</Label>
                 <Input
                   id="fullName"
-                  value={user?.fullName !== undefined ? user.fullName : ""}
-                  onChange={(e) => user && (user.fullName = e.target.value)}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder="Enter your full name"
                   className="mt-1 bg-background border border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
                   required
@@ -254,7 +253,7 @@ const CompleteProfile = () => {
 
               {/* Timezone */}
               <div>
-                <Label>Timezone *</Label>
+                {/* <Label>Timezone *</Label>
                 <Select value={timezone} onValueChange={setTimezone}>
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select your timezone" />
@@ -266,7 +265,7 @@ const CompleteProfile = () => {
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </Select>
+                </Select> */}
               </div>
 
               {/* Job Title */}
@@ -282,7 +281,7 @@ const CompleteProfile = () => {
               </div>
 
               {/* Company */}
-              <div>
+              {/* <div>
                 <Label htmlFor="company">Company *</Label>
                 <Input
                   id="company"
@@ -291,7 +290,7 @@ const CompleteProfile = () => {
                   placeholder="e.g., City Health Services"
                   className="mt-1"
                 />
-              </div>
+              </div> */}
 
               {/* Tags (Social Care Work) */}
               <div>
@@ -327,7 +326,7 @@ const CompleteProfile = () => {
               </div>
 
               {/* Language */}
-              <div>
+              {/* <div>
                 <Label>Language *</Label>
                 <Select value={language} onValueChange={setLanguage}>
                   <SelectTrigger className="mt-1">
@@ -341,10 +340,10 @@ const CompleteProfile = () => {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
 
               {/* Headline */}
-              <div>
+              {/* <div>
                 <Label htmlFor="headline">Headline *</Label>
                 <Input
                   id="headline"
@@ -353,7 +352,7 @@ const CompleteProfile = () => {
                   placeholder="e.g., Passionate Social Worker, Community Leader"
                   className="mt-1"
                 />
-              </div>
+              </div> */}
 
               {/* Phone Number */}
               <div>
@@ -370,7 +369,7 @@ const CompleteProfile = () => {
               </div>
 
               {/* Address */}
-              <div>
+              {/* <div>
                 <Label htmlFor="address">Address *</Label>
                 <Input
                   id="address"
@@ -380,7 +379,7 @@ const CompleteProfile = () => {
                   className="mt-1 bg-background border border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
                   required
                 />
-              </div>
+              </div> */}
 
               {/* Question 1 */}
               <div>

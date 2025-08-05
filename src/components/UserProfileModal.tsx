@@ -223,7 +223,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   {mergedUser.jobTitle || "Not specified"}
                 </p>
               </div>
-              <div>
+              {/* <div>
                 <h4 className="font-medium mb-2">Company</h4>
                 <p className="text-muted-foreground">
                   {mergedUser.company || "Not specified"}
@@ -234,7 +234,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 <p className="text-muted-foreground">
                   {mergedUser.timezone || "Not specified"}
                 </p>
-              </div>
+              </div> */}
               <div>
                 <h4 className="font-medium mb-2">Language</h4>
                 <p className="text-muted-foreground">
@@ -258,12 +258,12 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
               </div>
             </div>
 
-            <div>
+            {/* <div>
               <h4 className="font-medium mb-2">Headline</h4>
               <p className="text-muted-foreground">
                 {mergedUser.headline || "Not specified"}
               </p>
-            </div>
+            </div> */}
 
             <div>
               <h4 className="font-medium mb-2">Phone</h4>
@@ -291,12 +291,12 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   : "Not specified"}
               </p>
             </div>
-            <div>
+            {/* <div>
               <h4 className="font-medium mb-2">Address</h4>
               <p className="text-muted-foreground">
                 {mergedUser.address || "Not specified"}
               </p>
-            </div>
+            </div> */}
           </div>
         ) : (
           <div className="space-y-6">

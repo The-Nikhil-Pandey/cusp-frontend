@@ -28,6 +28,15 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!fullName || !email || !password) {
+      toast({
+        title: "Missing Fields",
+        description:
+          "Full Name, Email, and Password are mandatory. Please fill all fields.",
+        variant: "destructive",
+      });
+      return;
+    }
     setIsLoading(true);
     try {
       await signup(fullName, email, password);

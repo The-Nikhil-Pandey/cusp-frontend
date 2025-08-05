@@ -240,7 +240,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             />
           </div>
 
-          <div>
+          {/* <div>
             <Label htmlFor="company">Company</Label>
             <Input
               id="company"
@@ -248,9 +248,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               onChange={(e) => setCompany(e.target.value)}
               className="mt-1"
             />
-          </div>
+          </div> */}
 
-          <div>
+          {/* <div>
             <Label>Timezone</Label>
             <Select value={timezone} onValueChange={setTimezone}>
               <SelectTrigger className="mt-1">
@@ -264,7 +264,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
 
           <div>
             <Label>Social Care Work</Label>
@@ -307,7 +307,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           </div>
 
           {/* Headline */}
-          <div>
+          {/* <div>
             <Label htmlFor="headline">Headline</Label>
             <Input
               id="headline"
@@ -316,7 +316,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               placeholder="e.g., Passionate Social Worker, Community Leader"
               className="mt-1"
             />
-          </div>
+          </div> */}
 
           <div>
             <Label htmlFor="phone">Phone Number</Label>
@@ -329,7 +329,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             />
           </div>
 
-          <div>
+          {/* <div>
             <Label htmlFor="address">Address</Label>
             <Input
               id="address"
@@ -339,7 +339,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               className="mt-1 bg-background border border-primary/30 focus:border-primary focus:ring-2 focus:ring-primary/20 transition"
               required
             />
-          </div>
+          </div> */}
 
           <div>
             <Label>Are you planning to open a squat practice?</Label>
