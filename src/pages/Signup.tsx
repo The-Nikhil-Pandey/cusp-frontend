@@ -21,10 +21,36 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  // Password validation states
+  const [passwordValidations, setPasswordValidations] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false,
+  });
   const { signup } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const { theme } = useTheme();
+
+  const validatePassword = (pwd: string) => {
+    return {
+      length: pwd.length >= 6,
+      uppercase: /[A-Z]/.test(pwd),
+      lowercase: /[a-z]/.test(pwd),
+      number: /[0-9]/.test(pwd),
+      special: /[^A-Za-z0-9]/.test(pwd),
+    };
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+    setPasswordValidations(validatePassword(value));
+  };
+
+  const allValid = Object.values(passwordValidations).every(Boolean);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +59,14 @@ const Signup = () => {
         title: "Missing Fields",
         description:
           "Full Name, Email, and Password are mandatory. Please fill all fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!allValid) {
+      toast({
+        title: "Invalid Password",
+        description: "Password must meet all requirements before proceeding.",
         variant: "destructive",
       });
       return;
@@ -158,14 +192,14 @@ const Signup = () => {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     required
-                    minLength={8}
                     className="mt-1 pr-10"
                   />
+
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground focus:outline-none"
+                    className="absolute right-2 top-5 -translate-y-1/2 text-muted-foreground focus:outline-none"
                     tabIndex={-1}
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={
@@ -210,11 +244,62 @@ const Signup = () => {
                       </svg>
                     )}
                   </button>
+
+                  {/* Password requirements */}
+                  <ul className="mt-2 mb-2 text-sm">
+                    <li className="flex items-center gap-2">
+                      {passwordValidations.length ? (
+                        <span className="text-green-600">&#10003;</span>
+                      ) : (
+                        <span className="text-red-400">&#10007;</span>
+                      )}
+                      Minimum 6 characters
+                    </li>
+                    <li className="flex items-center gap-2">
+                      {passwordValidations.uppercase ? (
+                        <span className="text-green-600">&#10003;</span>
+                      ) : (
+                        <span className="text-red-400">&#10007;</span>
+                      )}
+                      At least one uppercase letter
+                    </li>
+                    <li className="flex items-center gap-2">
+                      {passwordValidations.lowercase ? (
+                        <span className="text-green-600">&#10003;</span>
+                      ) : (
+                        <span className="text-red-400">&#10007;</span>
+                      )}
+                      At least one lowercase letter
+                    </li>
+                    <li className="flex items-center gap-2">
+                      {passwordValidations.number ? (
+                        <span className="text-green-600">&#10003;</span>
+                      ) : (
+                        <span className="text-red-400">&#10007;</span>
+                      )}
+                      At least one number
+                    </li>
+                    <li className="flex items-center gap-2">
+                      {passwordValidations.special ? (
+                        <span className="text-green-600">&#10003;</span>
+                      ) : (
+                        <span className="text-red-400">&#10007;</span>
+                      )}
+                      At least one special character
+                    </li>
+                  </ul>
                 </div>
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
+              {/* Disable button if password is not valid */}
+              <style>{`
+                button[type='submit']:disabled {
+                  opacity: 0.6;
+                  cursor: not-allowed;
+                }
+              `}</style>
             </form>
 
             {/* <div className="mt-6">
